@@ -8,9 +8,9 @@ const Footer: React.FC = () => {
         <div className=" flex flex-row justify-between py-3 text-sm">
           <div className="inline-flex items-center">
             <CloudIcon className="w-5 h-5 mr-1.5" />
-            Powered by Amazon Web Services
+            Powered by Operisoft Technologies Private Limited
           </div>
-          <div className="inline-flex items-center hover:underline underline-offset-2">
+{/*           <div className="inline-flex items-center hover:underline underline-offset-2">
             <img
               src={GitHub}
               alt="React Logo"
@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
             <a href="https://github.com/aws-samples/serverless-pdf-chat">
               Source code on GitHub
             </a>
-          </div>
+          </div> */}
         </div>
       </footer>
     </div>
