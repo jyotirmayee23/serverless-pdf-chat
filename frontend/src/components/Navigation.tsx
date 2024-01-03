@@ -4,7 +4,7 @@ import {
   ArrowLeftOnRectangleIcon,
   ChevronDownIcon,
 } from "@heroicons/react/24/outline";
-import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/solid";
+// import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/solid";
 
 interface NavigationProps {
   userInfo: any;
@@ -18,7 +18,7 @@ const Navigation: React.FC<NavigationProps> = ({
   handleSignOutClick,
 }: NavigationProps) => {
   return (
-    <nav className="bg-violet-900">
+    <nav className="bg-orange-400">
       <div className="container flex flex-wrap items-center justify-between py-3">
         <Link
           to="/"
