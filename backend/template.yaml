@@ -312,6 +312,31 @@ Resources:
             Queue: !GetAtt EmbeddingQueue.Arn
             BatchSize: 1
 
+  my_api_gateway_triggered_function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/my_api_gateway_triggered_function/
+      Handler: main.handler
+      Runtime: python3.11
+      Role: arn:aws:iam::133341398902:role/role-for-bedrock-to-lambda
+      Layers:
+         - arn:aws:lambda:us-east-1:770693421928:layer:Klayers-p311-boto3:6
+         - arn:aws:lambda:us-east-1:133341398902:layer:final:1
+      MemorySize: 2048
+      Timeout: 430
+      Environment:
+        Variables:
+          DOCUMENT_TABLE: !Ref DocumentTable
+          MEMORY_TABLE: !Ref MemoryTable
+      Events:
+        NewLambdaEvent:
+          Type: Api
+          Properties:
+            Path: /new_lambda_endpoint
+            Method: POST
+
+
+
   GenerateResponseFunction:
     Type: AWS::Serverless::Function
     Properties:
