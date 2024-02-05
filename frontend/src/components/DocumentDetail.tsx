@@ -17,10 +17,10 @@ const DocumentDetail: React.FC<Document> = (document: Document) => {
         {document.filename}
       </h3>
       <div className="flex flex-col space-y-2">
-        <div className="inline-flex items-center">
+        {/* <div className="inline-flex items-center">
           <DocumentIcon className="w-4 h-4 mr-2" />
           {document.pages} pages
-        </div>
+        </div> */}
         <div className="inline-flex items-center">
           <CircleStackIcon className="w-4 h-4 mr-2" />
           {filesize(Number(document.filesize)).toString()}
