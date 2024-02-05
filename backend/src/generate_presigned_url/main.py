@@ -31,7 +31,7 @@ def s3_key_exists(bucket, key):
 def lambda_handler(event, context):
     user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
     file_name_full = event["queryStringParameters"]["file_name"]
-    file_name = file_name_full.split(".pdf")[0]
+    file_name, extension = os.path.splitext(file_name_full)
 
     exists = s3_key_exists(BUCKET, f"{user_id}/{file_name_full}/{file_name_full}")
 
@@ -46,7 +46,9 @@ def lambda_handler(event, context):
 
     if exists:
         suffix = shortuuid.ShortUUID().random(length=4)
-        key = f"{user_id}/{file_name}-{suffix}.pdf/{file_name}-{suffix}.pdf"
+        # Separate the filename and extension for CSV file
+        base_name, extension = os.path.splitext(file_name_full)
+        key = f"{user_id}/{base_name}-{suffix}{extension}/{base_name}-{suffix}{extension}"
     else:
         key = f"{user_id}/{file_name}.pdf/{file_name}.pdf"
 

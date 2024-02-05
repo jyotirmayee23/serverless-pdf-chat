@@ -37,7 +37,7 @@ Resources:
   DocumentBucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
+      BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-v1"
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders:
@@ -91,6 +91,32 @@ Resources:
       PolicyDocument:
         Version: "2012-10-17"
         Id: SecureTransportPolicy
+        Statement:
+          - Sid: AllowSecureTransportOnly
+            Effect: Deny
+            Principal: "*"
+            Action: "SQS:*"
+            Resource: "*"
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+  2Queue:
+    Type: AWS::SQS::Queue
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      VisibilityTimeout: 180
+      MessageRetentionPeriod: 3600
+
+  2QueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref 2Queue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: SecureTransportPolicy2
         Statement:
           - Sid: AllowSecureTransportOnly
             Effect: Deny
@@ -201,7 +227,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref MemoryTable
         - S3ReadPolicy:
-            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}*"
+            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-v1*"
         - SQSSendMessagePolicy:
             QueueName: !GetAtt EmbeddingQueue.QueueName
       Environment:
@@ -209,7 +235,7 @@ Resources:
           DOCUMENT_TABLE: !Ref DocumentTable
           MEMORY_TABLE: !Ref MemoryTable
           QUEUE: !GetAtt EmbeddingQueue.QueueName
-          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
+          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-v1"
       Events:
         S3Event:
           Type: S3
@@ -221,7 +247,36 @@ Resources:
               S3Key:
                 Rules:
                   - Name: suffix
-                    Value: .pdf
+                    Value: .pdf,.csv 
+
+  MondayUploadTriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Monday_upload_trigger/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DocumentTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MemoryTable
+        - S3ReadPolicy:
+            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-jyoti*"
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt 2Queue.QueueName
+      Environment:
+        Variables:
+          DOCUMENT_TABLE: !Ref DocumentTable
+          MEMORY_TABLE: !Ref MemoryTable
+          QUEUE: !GetAtt 2Queue.QueueName
+          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-jyoti"
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /Monday_upload_trigger
+            Method: POST
+        
+           
 
   GetDocumentFunction:
     Type: AWS::Serverless::Function
@@ -311,6 +366,35 @@ Resources:
           Properties:
             Queue: !GetAtt EmbeddingQueue.Arn
             BatchSize: 1
+  
+  MondayGenerateEmbeddingsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Monday_generate_embeddings/
+      Timeout: 180
+      MemorySize: 2048
+      Policies:
+        - SQSPollerPolicy:
+            QueueName: !GetAtt 2Queue.QueueName
+        - S3CrudPolicy:
+            BucketName: !Ref DocumentBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DocumentTable
+        - Statement:
+            - Sid: "BedrockScopedAccess"
+              Effect: "Allow"
+              Action: "bedrock:InvokeModel"
+              Resource: "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v1"
+      Environment:
+        Variables:
+          DOCUMENT_TABLE: !Ref DocumentTable
+          BUCKET: !Ref DocumentBucket
+      Events:
+        EmbeddingQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt 2Queue.Arn
+            BatchSize: 1
 
   GenerateResponseFunction:
     Type: AWS::Serverless::Function
@@ -384,7 +468,7 @@ Resources:
     Type: AWS::Amplify::Branch
     Condition: DeployToAmplifyHosting
     Properties:
-      BranchName: main
+      BranchName: feature_v1
       AppId: !GetAtt AmplifyApp.AppId
       EnableAutoBuild: true
 

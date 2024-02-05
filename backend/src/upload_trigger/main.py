@@ -45,7 +45,7 @@ def lambda_handler(event, context):
         "documentid": document_id,
         "filename": file_name,
         "created": timestamp_str,
-        "pages": pages,
+        # "pages": pages,
         "filesize": str(event["Records"][0]["s3"]["object"]["size"]),
         "docstatus": "UPLOADED",
         "conversations": [],

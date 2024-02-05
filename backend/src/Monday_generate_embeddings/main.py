@@ -1,4 +1,6 @@
-import os, json
+import os
+import json
+import requests
 import boto3
 from aws_lambda_powertools import Logger
 from langchain.embeddings import BedrockEmbeddings
@@ -6,7 +8,12 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.vectorstores import FAISS
 from langchain_community.document_loaders.csv_loader import CSVLoader
-
+# from langchain_community.document_loaders import UnstructuredExcelLoader
+# from langchain_community.document_loaders import UnstructuredPowerPointLoader
+from langchain_community.document_loaders import UnstructuredFileLoader
+# from langchain_community.document_loaders import Docx2txtLoader
+# from langchain_community.document_loaders.excel import UnstructuredExcelLoader
+# from langchain.document_loaders import UnstructuredWordDocumentLoader
 
 DOCUMENT_TABLE = os.environ["DOCUMENT_TABLE"]
 BUCKET = os.environ["BUCKET"]
@@ -16,7 +23,6 @@ ddb = boto3.resource("dynamodb")
 document_table = ddb.Table(DOCUMENT_TABLE)
 logger = Logger()
 
-
 def set_doc_status(user_id, document_id, status):
     document_table.update_item(
         Key={"userid": user_id, "documentid": document_id},
@@ -24,31 +30,42 @@ def set_doc_status(user_id, document_id, status):
         ExpressionAttributeValues={":docstatus": status},
     )
 
-
 @logger.inject_lambda_context(log_event=True)
 def lambda_handler(event, context):
     event_body = json.loads(event["Records"][0]["body"])
     document_id = event_body["documentid"]
     user_id = event_body["user"]
-    key = event_body["key"]
-    file_name_full = key.split("/")[-1]
+    public_url = event_body["public_url"]
+    file_name = event_body["file_name"]
 
     set_doc_status(user_id, document_id, "PROCESSING")
 
-    s3.download_file(BUCKET, key, f"/tmp/{file_name_full}")
-
-    file_path = f"/tmp/{file_name_full}"
-    file_extension = os.path.splitext(file_name_full)[1].lower()
+    response = requests.get(public_url, stream=True)
+    with open(f"/tmp/{file_name}", 'wb') as out_file:
+        out_file.write(response.content)
+    
+    file_path = f"/tmp/{file_name}"
+    file_extension = os.path.splitext(file_name)[1].lower()
 
     if file_extension == ".pdf":
-        loader = PyPDFLoader(f"/tmp/{file_name_full}")
+        loader = PyPDFLoader(f"/tmp/{file_name}")
     elif file_extension == ".csv":
-        loader = CSVLoader(file_path=f"/tmp/{file_name_full}")
+        loader = CSVLoader(file_path=f"/tmp/{file_name}")
+    elif file_extension in (".xls", ".xlsx"):
+        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name}")
+        # docs = UnstructuredExcelLoader(f"/tmp/{file_name}", mode="elements")
+        # loader = loader.load()
+    elif file_extension == ".pptx":
+        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name}")
+        # data = UnstructuredPowerPointLoader(f"/tmp/{file_name}")
+        # loader = loader.load()
+    elif file_extension == ".doc":
+        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name}")
+        # loader = UnstructuredWordDocumentLoader(file_path)
     else:
         raise ValueError(f"Unsupported file type: {file_extension}")
 
-
-    # loader = PyPDFLoader(f"/tmp/{file_name_full}")
+    # loader = PyPDFLoader(f"/tmp/{file_name}")
 
     bedrock_runtime = boto3.client(
         service_name="bedrock-runtime",
@@ -64,15 +81,15 @@ def lambda_handler(event, context):
     index_creator = VectorstoreIndexCreator(
         vectorstore_cls=FAISS,
         embedding=embeddings,
-    )
+    ) 
 
     index_from_loader = index_creator.from_loaders([loader])
 
     index_from_loader.vectorstore.save_local("/tmp")
 
     s3.upload_file(
-        "/tmp/index.faiss", BUCKET, f"{user_id}/{file_name_full}/index.faiss"
+        "/tmp/index.faiss", BUCKET, f"{user_id}/{file_name}/index.faiss"
     )
-    s3.upload_file("/tmp/index.pkl", BUCKET, f"{user_id}/{file_name_full}/index.pkl")
+    s3.upload_file("/tmp/index.pkl", BUCKET, f"{user_id}/{file_name}/index.pkl")
 
     set_doc_status(user_id, document_id, "READY")
