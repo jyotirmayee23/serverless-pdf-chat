@@ -39,7 +39,7 @@ Amplify.configure({
 let router;
 
 function App(): JSX.Element {
-  const [context, setContext] = useState(false);
+  const [context, setContext] = useState([]);
 
   useEffect(() => {
     monday.execute("valueCreatedForUser");

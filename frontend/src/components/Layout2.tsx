@@ -14,9 +14,6 @@ function Layout2() {
   const [loading, setLoading] = useState(false);
   const [messageStatus, setMessageStatus] = useState("");
 
-
-
-
   useEffect(() => {
     fetchData();
   }, [storedBoardId]);
@@ -69,7 +66,7 @@ function Layout2() {
         );
         setConversation(conversationData);
         setLoading(false);
-        setIdle(true)
+        // setIdle(true)
       } catch (error) {
         console.error('Error fetching conversation:', error);
       }
