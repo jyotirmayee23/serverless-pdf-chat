@@ -37,7 +37,7 @@ Resources:
   DocumentBucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-v1"
+      BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders:
@@ -227,7 +227,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref MemoryTable
         - S3ReadPolicy:
-            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-v1*"
+            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}*"
         - SQSSendMessagePolicy:
             QueueName: !GetAtt EmbeddingQueue.QueueName
       Environment:
@@ -235,7 +235,7 @@ Resources:
           DOCUMENT_TABLE: !Ref DocumentTable
           MEMORY_TABLE: !Ref MemoryTable
           QUEUE: !GetAtt EmbeddingQueue.QueueName
-          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-v1"
+          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
       Events:
         S3Event:
           Type: S3
@@ -247,7 +247,9 @@ Resources:
               S3Key:
                 Rules:
                   - Name: suffix
-                    Value: .pdf,.csv 
+                    Value: .pdf
+                  - Name: suffix
+                    Value: .csv
 
   MondayUploadTriggerFunction:
     Type: AWS::Serverless::Function
@@ -468,7 +470,7 @@ Resources:
     Type: AWS::Amplify::Branch
     Condition: DeployToAmplifyHosting
     Properties:
-      BranchName: feature_v1
+      BranchName: dev_feature_v2
       AppId: !GetAtt AmplifyApp.AppId
       EnableAutoBuild: true
 
