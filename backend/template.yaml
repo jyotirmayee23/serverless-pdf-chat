@@ -248,17 +248,6 @@ Resources:
                 Rules:
                   - Name: suffix
                     Value: .pdf
-	S3Event:
-          Type: S3
-          Properties:
-            Bucket: !Ref DocumentBucket
-            Events:
-              - s3:ObjectCreated:*
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: suffix
-                    Value: .csv
 
   MondayUploadTriggerFunction:
     Type: AWS::Serverless::Function
