@@ -5,6 +5,7 @@ from langchain.embeddings import BedrockEmbeddings
 from langchain.document_loaders import PyPDFLoader
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.vectorstores import FAISS
+from langchain_community.document_loaders.csv_loader import CSVLoader
 
 
 DOCUMENT_TABLE = os.environ["DOCUMENT_TABLE"]
@@ -36,7 +37,28 @@ def lambda_handler(event, context):
 
     s3.download_file(BUCKET, key, f"/tmp/{file_name_full}")
 
-    loader = PyPDFLoader(f"/tmp/{file_name_full}")
+    print("file_name_full", file_name_full)
+    file_extension = os.path.splitext(file_name_full)[1].lower()
+
+    if file_extension == ".pdf":
+        loader = PyPDFLoader(f"/tmp/{file_name_full}")
+    elif file_extension == ".csv":
+        loader = CSVLoader(file_path=f"/tmp/{file_name_full}")
+    elif file_extension in (".xls", ".xlsx"):
+        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name_full}")
+        # docs = UnstructuredExcelLoader(f"/tmp/{file_name}", mode="elements")
+        # loader = loader.load()
+    elif file_extension == ".pptx":
+        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name_full}")
+        # data = UnstructuredPowerPointLoader(f"/tmp/{file_name}")
+        # loader = loader.load()
+    elif file_extension == ".doc":
+        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name_full}")
+        # loader = UnstructuredWordDocumentLoader(file_path)
+    else:
+        raise ValueError(f"Unsupported file type: {file_extension}")
+
+    # loader = PyPDFLoader(f"/tmp/{file_name_full}")
 
     bedrock_runtime = boto3.client(
         service_name="bedrock-runtime",

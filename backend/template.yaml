@@ -37,7 +37,7 @@ Resources:
   DocumentBucket:
     Type: "AWS::S3::Bucket"
     Properties:
-      BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
+      BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-jyoti"
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders:
@@ -216,7 +216,6 @@ Resources:
             RestApiId: !Ref Api
             Path: /generate_presigned_url
             Method: GET
-
   UploadTriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -227,7 +226,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref MemoryTable
         - S3ReadPolicy:
-            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}*"
+            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-jyoti*"
         - SQSSendMessagePolicy:
             QueueName: !GetAtt EmbeddingQueue.QueueName
       Environment:
@@ -235,7 +234,7 @@ Resources:
           DOCUMENT_TABLE: !Ref DocumentTable
           MEMORY_TABLE: !Ref MemoryTable
           QUEUE: !GetAtt EmbeddingQueue.QueueName
-          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
+          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-jyoti"
       Events:
         S3EventPdf:
           Type: S3
@@ -286,8 +285,6 @@ Resources:
             RestApiId: !Ref Api
             Path: /Monday_upload_trigger
             Method: POST
-        
-           
 
   GetDocumentFunction:
     Type: AWS::Serverless::Function
