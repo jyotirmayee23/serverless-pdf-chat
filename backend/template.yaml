@@ -459,7 +459,7 @@ Resources:
                 paths:
                   - node_modules/**/*
             appRoot: frontend
-      AccessToken: "{{resolve:secretsmanager:serverless-pdf-chat-github-token}}"
+      AccessToken: "{{resolve:secretsmanager:devdocchat1}}"
       EnvironmentVariables:
         - Name: AMPLIFY_MONOREPO_APP_ROOT
           Value: frontend
