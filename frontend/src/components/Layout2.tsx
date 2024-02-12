@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react'
 import DocumentsList2 from './DocumentsList2';
 import ChatBox from './ChatBox';
 import { API } from "aws-amplify";
- 
+
+
+ interface Conversation{
+  messages:any[];
+}
  
 function Layout2() {
   const storedBoardId = sessionStorage.getItem('boardId');
   // console.log("s boardid", storedBoardId);
   const [files, setFiles] = useState([])
   const [docs, setDocs] = useState([]);
-  const [conversation, setConversation] = useState([]);
+  const [conversation, setConversation] = useState<Conversation>({messages: [] });
   const [messageStatus, setMessageStatus] = useState < string > ("idle");
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = React.useState < string > ("idle");
