@@ -16,37 +16,44 @@ const DocumentUploader: React.FC = () => {
 
   useEffect(() => {
     if (selectedFile) {
-      if (selectedFile.type === "application/pdf") {
+      const fileType = selectedFile.type;
+      if (fileType === "application/pdf" || fileType === "text/csv") {
         setInputStatus("valid");
       } else {
         setSelectedFile(null);
       }
     }
   }, [selectedFile]);
-
+  
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     setSelectedFile(file || null);
   };
-
+  
   const uploadFile = async () => {
     setButtonStatus("uploading");
-    await API.get("serverless-pdf-chat", "/generate_presigned_url", {
-      headers: { "Content-Type": "application/json" },
-      queryStringParameters: {
-        file_name: selectedFile?.name,
-      },
-    }).then((presigned_url) => {
-      fetch(presigned_url.presignedurl, {
-        method: "PUT",
-        body: selectedFile,
-        headers: { "Content-Type": "application/pdf" },
-      }).then(() => {
-        setButtonStatus("success");
+  
+    if (selectedFile) {
+      const contentType =
+        selectedFile.type === "application/pdf" ? "application/pdf" : "text/csv";
+  
+      await API.get("serverless-pdf-chat", "/generate_presigned_url", {
+        headers: { "Content-Type": "application/json" },
+        queryStringParameters: {
+          file_name: selectedFile?.name,
+        },
+      }).then((presigned_url) => {
+        fetch(presigned_url.presignedurl, {
+          method: "PUT",
+          body: selectedFile,
+          headers: { "Content-Type": contentType },
+        }).then(() => {
+          setButtonStatus("success");
+        });
       });
-    });
+    } // Add this closing bracket
   };
-
+  
   const resetInput = () => {
     setSelectedFile(null);
     setInputStatus("idle");
@@ -69,7 +76,7 @@ const DocumentUploader: React.FC = () => {
                 <span className="font-semibold">Click to upload</span> your
                 document
               </p>
-              <p className="text-xs text-gray-500">Only .pdf accepted</p>
+              <p className="text-xs text-gray-500">Only .pdf / .csv accepted</p>
             </div>
 
             <input
