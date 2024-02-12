@@ -3,94 +3,125 @@ import Colorfullloader from './Colorfullloader';
 import Chatbroilerplate from './Chatbroilerplate';
 import { HiOutlinePaperAirplane } from "react-icons/hi2";
 import Loading from "../../public/loading-dots.svg";
-
+ 
 function ChatBox({
-  showMain,
+  prompt,
   conversation,
-  onButtonClick,
-  loading,
-  handleKeyPress,
   messageStatus,
+  submitMessage,
+  handlePromptChange,
+  handleKeyPress,
 }) {
   if (!conversation || !conversation.messages || !conversation.document) {
     return (
       <div className='chat_container2 h-96 flex p-4'>
         <div className="w-[100%] rounded-md">
-          {/* <p className='text-center'>✨ Click the files on the left and let the conversation unfold!</p>
-          <p className='text-center'>Your questions, their answers – just a click away. 💬📁</p> */}
           <Chatbroilerplate />
         </div>
       </div>
     );
   }
-  const [chatContent, setChatContent] = useState([]);
   const [filename, setFilename] = useState('');
   const [conversationId, setConversationId] = useState('');
   const [documentId, setDocumentId] = useState('');
-  const [inputValue, setInputValue] = useState("");
-  console.log("msg status", messageStatus)
-
+  // const [inputValue, setInputValue] = useState("");
+  // console.log("msg status", messageStatus)
+ 
   useEffect(() => {
     if (conversation) {
       setConversationId(conversation.conversationid);
       setFilename(conversation.document.filename);
       setDocumentId(conversation.document.documentid)
-      if (messageStatus === "idle") {
-        setInputValue("");
-      }
     }
   }, [conversation, messageStatus]);
   return (
-    <div className="chat_container">
-      <>
-        <div className="sample_chat_box">
-          {conversation && conversation.messages ? (
-            conversation.messages.map((message, i) => (
-              <div
-                className={`${message.type === "ai"
-                  ? "justify-self-end w-fit rounded border border-gray-100 px-5 py-3.5 text-gray-800"
-                  : "justify-self-start w-fit bg-slate-100 rounded border border-gray-100 px-5 py-3.5 text-gray-800 my-4"
-                  }`}
-                key={i}
-              >
-                <div className="prose">
-                  <p>{message.data.content}</p>
-                </div>
-              </div>
-            ))
-          ) : null}
-          {loading && <img src={Loading} width={40} className="py-2 mx-2" />}
-        </div>
-        <div className='input_section'>
-          <div className="input_box">
-            <input
-              disabled={loading}
-              required
-              type="text"
-              className="msg_input"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              placeholder={`Ask ${conversation.document.filename} anything...`}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  onButtonClick(conversationId, filename, inputValue, documentId);
-                } else {
-                  handleKeyPress(conversationId, filename, inputValue, documentId);
-                }
-              }}
-            />
-            <button
-              type="button"
-              className="send_btn"
-              onClick={() => onButtonClick(conversationId, filename, inputValue, documentId)}
+    <div className="flex flex-col justify-between h-full overflow-y-auto col-span-8 p-5 border-l border-gray-200">
+      <div className="pb-5">
+        <div className="grid gap-5">
+          {conversation.messages.map((message, i) => (
+            <div
+              className={`${message.type === "ai"
+                ? "justify-self-start w-fit rounded border border-gray-100 px-5 py-3.5 text-gray-800"
+                : "" +
+                "justify-self-end w-fit bg-slate-100 rounded border border-gray-100 px-5 py-3.5 text-gray-800"
+                }`}
+              key={i}
             >
-              {loading ? <div className="loader"></div> : <p><HiOutlinePaperAirplane /></p>}
-            </button>
-          </div>
+              <div className="prose">
+                <p>{message.data.content}</p>
+              </div>
+            </div>
+          ))}
+          {messageStatus === "loading" && (
+            <div className="justify-self-start w-fit rounded border border-gray-100 px-5 py-3.5 text-gray-800">
+              <img src={Loading} width={40} className="py-2 mx-2" />
+            </div>
+          )}
         </div>
-      </>
+      </div>
+ 
+      <div className="relative w-full">
+        <div className="relative">
+          <input
+            disabled={messageStatus === "loading"}
+            type="text"
+            id="prompt"
+            value={prompt}
+            onChange={handlePromptChange}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                submitMessage(conversationId, filename, prompt, documentId);
+              } else {
+                handleKeyPress(conversationId, filename, inputValue, documentId);
+              }
+            }}
+            className={
+              messageStatus === "loading"
+                ? "block w-full p-4 pl-4 text-sm text-gray-500 border border-gray-200 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                : "block w-full p-4 pl-4 text-sm text-gray-900 border border-gray-200 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+            }
+            placeholder={
+              "Ask " + conversation.document.filename + " anything..."
+            }
+          />
+          {messageStatus === "idle" && (
+            <button
+              type="submit"
+              className="text-gray-700 absolute right-2 bottom-2 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+              onClick={() => submitMessage(conversationId, filename, prompt, documentId)}
+            >
+              <HiOutlinePaperAirplane className="w-6 h-6" />
+            </button>
+          )}
+          {messageStatus === "loading" && (
+            <button
+              disabled
+              type="submit"
+              className="text-gray-700 absolute right-2 bottom-2 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2"
+            >
+              <svg
+                aria-hidden="true"
+                role="status"
+                className="inline w-5 h-5 text-gray-200 animate-spin dark:text-gray-600"
+                viewBox="0 0 100 101"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                  fill="#4C1D95"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
-
+ 
 export default ChatBox;
