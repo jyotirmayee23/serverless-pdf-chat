@@ -73,7 +73,7 @@ function App(): JSX.Element {
     ]);
   }
 
-  return <RouterProvider router={router!} />;
+  return <RouterProvider router={router} />;
 }
 
 export default withAuthenticator(App, { hideSignUp: true });
