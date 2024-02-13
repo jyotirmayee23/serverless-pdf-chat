@@ -25,7 +25,7 @@ function DocumentsList2({ fileData, handlestartchatParent, documents, toggleMain
   // Extract the logic into a separate function
   const updateShowFiles = (fileData, documents) => {
     const updatedShowFiles = fileData
-      .filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.csv') || file.name.toLowerCase().endsWith('.pptx'))
+      .filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.csv') || file.name.toLowerCase().endsWith('.pptx') || file.name.toLowerCase().endsWith('.docx') || file.name.toLowerCase().endsWith('.doc') || file.name.toLowerCase().endsWith('.txt'))
       .map(file => {
         const existsInDocuments = documents.some(doc => doc.filename === file.name);
         const matchingDocument = existsInDocuments ? documents.find(doc => doc.filename === file.name) : null;
