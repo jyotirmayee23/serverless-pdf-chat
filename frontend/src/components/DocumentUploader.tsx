@@ -83,7 +83,7 @@ const DocumentUploader: React.FC = () => {
                 <span className="font-semibold">Click to upload</span> your
                 document
               </p>
-              <p className="text-xs text-gray-500">Only .pdf / .csv accepted</p>
+              <p className="text-xs text-gray-500">Only .pdf , .csv , .txt , .docx accepted</p>
             </div>
 
             <input
