@@ -6,6 +6,8 @@ from langchain.document_loaders import PyPDFLoader
 from langchain.indexes import VectorstoreIndexCreator
 from langchain.vectorstores import FAISS
 from langchain_community.document_loaders.csv_loader import CSVLoader
+from langchain.document_loaders import Docx2txtLoader
+from langchain.document_loaders import TextLoader
 
 
 DOCUMENT_TABLE = os.environ["DOCUMENT_TABLE"]
@@ -44,17 +46,10 @@ def lambda_handler(event, context):
         loader = PyPDFLoader(f"/tmp/{file_name_full}")
     elif file_extension == ".csv":
         loader = CSVLoader(file_path=f"/tmp/{file_name_full}")
-    elif file_extension in (".xls", ".xlsx"):
-        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name_full}")
-        # docs = UnstructuredExcelLoader(f"/tmp/{file_name}", mode="elements")
-        # loader = loader.load()
-    elif file_extension == ".pptx":
-        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name_full}")
-        # data = UnstructuredPowerPointLoader(f"/tmp/{file_name}")
-        # loader = loader.load()
-    elif file_extension == ".doc":
-        loader = UnstructuredFileLoader(file_path=f"/tmp/{file_name_full}")
-        # loader = UnstructuredWordDocumentLoader(file_path)
+    elif file_extension == ".doc" or file_extension == ".docx" :
+        loader = Docx2txtLoader(file_path=f"/tmp/{file_name_full}")
+    elif file_extension == ".txt":
+        loader = TextLoader(file_path=f"/tmp/{file_name_full}")
     else:
         raise ValueError(f"Unsupported file type: {file_extension}")
 

@@ -258,6 +258,28 @@ Resources:
                 Rules:
                   - Name: suffix
                     Value: .csv
+        S3Eventtxt:
+          Type: S3
+          Properties:
+            Bucket: !Ref DocumentBucket
+            Events:
+              - s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .txt
+        S3Eventdocx:
+          Type: S3
+          Properties:
+            Bucket: !Ref DocumentBucket
+            Events:
+              - s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .docx
 
   MondayUploadTriggerFunction:
     Type: AWS::Serverless::Function
@@ -284,6 +306,27 @@ Resources:
           Properties:
             RestApiId: !Ref Api
             Path: /Monday_upload_trigger
+            Method: POST
+  
+  DeleteHistoryTriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Delete_History/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DocumentTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MemoryTable
+      Environment:
+        Variables:
+          DOCUMENT_TABLE: !Ref DocumentTable
+          MEMORY_TABLE: !Ref MemoryTable
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /Delete_History
             Method: POST
 
   GetDocumentFunction:

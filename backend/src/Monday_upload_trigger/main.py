@@ -9,10 +9,6 @@ import uuid
 import requests
 from aws_lambda_powertools import Logger
 from decimal import Decimal
-# import pandas as pd
-# import openpyxl
-# from pptx import Presentation
-# import docx
 
 
 DOCUMENT_TABLE = os.environ["DOCUMENT_TABLE"]
@@ -26,21 +22,7 @@ if "2Queue" in queue_name:
     print(f"Set QUEUE variable to: {queue_name}")
 else:
     print("The environment variable QUEUE does not contain '2Queue'")
-# for key, value in os.environ.items():
-#     print(f"{key}: {value}")
-# queue_names = os.environ["QUEUE"].split(',')
-# selected_queue_name = next((q for q in queue_names if "2Queue" in q), None)
 
-# if selected_queue_name:
-#     # Get the QueueUrl for the selected dynamic queue
-#     response = sqs.get_queue_url(QueueName=selected_queue_name)
-#     queue_url = response['QueueUrl']
-
-# else:
-#     raise ValueError("No queue with '2Queue' found in the provided list.")
-# print(queue_url)
-# BUCKET = os.environ["BUCKET"]
-# QUEUE = queue_url
 QUEUE = queue_name
 print(QUEUE)
 
@@ -73,34 +55,6 @@ def lambda_handler(event, context):
         
     file_extension = os.path.splitext(file_name)[1].lower()
     file_size = os.path.getsize(f"/tmp/{file_name}")
-    # file_size = Decimal(file_size_bytes / 1024)
-    # with open(f"/tmp/{file_name}", "rb") as f:
-    #     if file_extension == ".pdf":
-    #         reader = PyPDF2.PdfReader(f)
-    #         pages = str(len(reader.pages))
-        # elif file_extension == ".csv":
-        #     df = pd.read_csv(f)
-        #     pages = str(len(df))
-        # elif file_extension == ".xlsx":
-        #     wb = openpyxl.load_workbook(filename=f)
-        #     pages = str(len(wb.sheetnames))
-        # elif file_extension == ".doc":
-        #     doc = docx.Document(f)
-        #     pages = str(len(doc.paragraphs))
-        # elif file_extension == ".ppt":
-        #     prs = Presentation(f)
-        #     pages = str(len(prs.slides))
-        # else:
-        #     pages = "N/A"  # Pages information not applicable for non-PDF files
-
-        # file_sizee_bytes = os.path.getsize(f"/tmp/{file_name}")
-        # file_size = file_sizee_bytes / 1024
-
-    # with open(f"/tmp/{file_name}", "rb") as f:
-    #     reader = PyPDF2.PdfReader(f)
-    #     pages = str(len(reader.pages))
-
-    #     file_size = os.path.getsize(f"/tmp/{file_name}")
 
     conversation_id = str(uuid.uuid4())
 

@@ -59,6 +59,10 @@ def lambda_handler(event, context):
         content_type = "application/pdf"
     elif extension.lower() == ".csv":
         content_type = "text/csv"
+    elif extension.lower() == ".txt":
+        content_type = "text/plain"
+    elif extension.lower() == ".docx":
+        content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     else:
         content_type = "application/octet-stream"
 
