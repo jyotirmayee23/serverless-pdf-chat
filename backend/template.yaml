@@ -327,7 +327,33 @@ Resources:
           Properties:
             RestApiId: !Ref Api
             Path: /Delete_History
-            Method: POST
+            Method: Delete
+
+  DeleteFullTriggerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/Delete_Full/
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DocumentTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MemoryTable
+        - S3CrudPolicy:
+            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-jyoti*"
+            Actions:
+              - s3:DeleteObject
+      Environment:
+        Variables:
+          DOCUMENT_TABLE: !Ref DocumentTable
+          MEMORY_TABLE: !Ref MemoryTable
+          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}-jyoti"
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /Delete_Full
+            Method: delete
 
   GetDocumentFunction:
     Type: AWS::Serverless::Function
