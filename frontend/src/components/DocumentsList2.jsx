@@ -2,15 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { API } from "aws-amplify";
 import { BsThreeDots } from "react-icons/bs";
 import Loading from "../../public/loading-dots.svg";
+import { RiDeleteBin7Fill } from "react-icons/ri";
+import { FaFileCircleXmark } from "react-icons/fa6";
  
-function DocumentsList2({ fileData, handlestartchatParent, documents, toggleMain }) {
+function DocumentsList2({
+  fileData,
+  handlestartchatParent,
+  documents,
+  handleUploadFileToMonday,
+  handleDeletchat,
+  handleDeletFull,
+}) {
   const [showFiles, setShowFiles] = useState([]);
   const [metaState, setMetaState] = useState('');
   const [selectedFile, setSelectedFile] = useState([]);
   const [loadingDots, setLoadingDots] = useState(0);
   const [processing, setProcessing] = useState(null);
-  const [componentKey, setComponentKey] = useState(0);
   const [clickedFileIndex, setClickedFileIndex] = useState(null);
+  const [clickedFileId, setClickedFileId] = useState(null);
+ 
+  const handleThreedotsClick = (filename) => {
+    setClickedFileId(filename === clickedFileId ? null : filename);
+  };
  
  
   useEffect(() => {
@@ -25,7 +38,7 @@ function DocumentsList2({ fileData, handlestartchatParent, documents, toggleMain
   // Extract the logic into a separate function
   const updateShowFiles = (fileData, documents) => {
     const updatedShowFiles = fileData
-      .filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.csv') || file.name.toLowerCase().endsWith('.pptx') || file.name.toLowerCase().endsWith('.docx') || file.name.toLowerCase().endsWith('.doc') || file.name.toLowerCase().endsWith('.txt'))
+      .filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.csv'))
       .map(file => {
         const existsInDocuments = documents.some(doc => doc.filename === file.name);
         const matchingDocument = existsInDocuments ? documents.find(doc => doc.filename === file.name) : null;
@@ -91,12 +104,7 @@ function DocumentsList2({ fileData, handlestartchatParent, documents, toggleMain
         ...file,
         backgroundColor: index === fileIndex ? '#6B7280' : undefined,
       }));
- 
-      // Update the showFiles state with the modified array
       setShowFiles(updatedShowFiles);
- 
-      // Trigger component reload by updating the key
-      setComponentKey(prevKey => prevKey + 1);
     }
  
     // Call your start chat function
@@ -115,6 +123,7 @@ function DocumentsList2({ fileData, handlestartchatParent, documents, toggleMain
  
  
  
+ 
   const getBackgroundColor = (file) => {
     if (file.meta === 'meta') {
       return '#E5E7EB';
@@ -126,19 +135,22 @@ function DocumentsList2({ fileData, handlestartchatParent, documents, toggleMain
   };
   return (
     <div>
-      <h6 className='doc_heading font-medium'>Files Gallery</h6>
+      <div className='flex align-middle justify-between'>
+        <div>
+          <h6 className='doc_heading font-medium'>Files Gallery</h6>
+        </div>
+      </div>
       <div>
         {fileData.length > 0 ? (
           showFiles.map((file, index) => (
             <div
-              className={`file_container rounded-md p-0 ${index === clickedFileIndex ? 'clicked' : ''}`}
+              className={`file_container rounded-md p-0 flex ${index === clickedFileIndex ? 'clicked' : ''}`}
               key={index}
               style={{ backgroundColor: file.backgroundColor || getBackgroundColor(file) }}
             >
-              <div className='py-1 px-3'>
+              <div className='py-1 px-3 w-[70%]'>
                 <div className='flex justify-between'>
                   <p className='file_name font-light'>{file.name}</p>
-                  <p className='cursor-pointer'><BsThreeDots /></p>
                 </div>
                 {/* <p>{file.meta}</p> */}
                 {file.meta === 'nometa' && (
@@ -151,17 +163,35 @@ function DocumentsList2({ fileData, handlestartchatParent, documents, toggleMain
                 )}
                 {file.meta === 'meta' && (
                   <div className='flex align-middle p-0 w-[100%]'>
-                    <div className='py-1 w-[50%]'>
+                    <div className='py-1 w-[25%]'>
                       <p className='file_size'>{formatFileSize(file.filesize)}</p>
                     </div>
-                    {/* <p>Pages: {file.pages}</p> */}
-                    <div className='w-[50%] flex justify-end'>
+                    <div className='w-[75%] flex justify-start'>
                       <button className='ready_to_chat_btn rounded-sm' onClick={(e) => handlestartchat(file.documentid, file.conversationid)}>
-                        <p className='tracking-wider'>start conversation</p>
+                        <p className='tracking-wider text-sm'>start conversation</p>
                       </button>
                     </div>
                   </div>
                 )}
+              </div>
+              <div className='w-[30%]'>
+                <div className='flex justify-end'>
+                  <p className='cursor-pointer text-end' onClick={() => handleThreedotsClick(file.name)}><BsThreeDots /></p>
+                </div>
+                <div className='relative'>
+                  {file.meta === 'meta' && clickedFileId !== null && file.name === clickedFileId && (
+                    <div className='buttons_div bg-white rounded-sm py-1 px-2'>
+                      <div className='flex text-center hover:bg-sky-100'>
+                        <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
+                          onClick={(e) => handleDeletchat(file.conversationid)}>Delet chat</p>
+                      </div>
+                      <div className='flex hover:bg-sky-100'>
+                        <p className='cursor-pointer text-sm text-[12px] text-[#434343] mx-auto'
+                          onClick={(e) => handleDeletFull(file.conversationid, file.documentid)}>Delet file</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))
@@ -173,7 +203,7 @@ function DocumentsList2({ fileData, handlestartchatParent, documents, toggleMain
           </div>
         )}
       </div>
-    </div>
+    </div >
   );
 }
  
