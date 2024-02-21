@@ -39,7 +39,10 @@ html {
   padding: 10px 10px;
   /* border-right: 2px solid #F3F4F6; */
 }
-.clicked p{
+.clicked .file_size{
+  color: white;
+}
+.clicked .file_name{
   color: white;
 }
 .clicked .ready_to_chat_btn p{
@@ -620,4 +623,13 @@ button.start_chat_btn {
   to {
     transform: scale(1.2);
   }
+}
+.buttons_div {
+  display: block;
+}
+ 
+.buttons_div.visible {
+  display: block;
+  opacity: 5;
+  transform: translateX(0);
 }
