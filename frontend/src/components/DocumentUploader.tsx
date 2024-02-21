@@ -90,6 +90,7 @@ const DocumentUploader: React.FC = () => {
               onChange={handleFileChange}
               id="dropzone-file"
               type="file"
+              accept=".pdf, .csv, .txt, .docx,"
               className="hidden"
             />
           </label>
