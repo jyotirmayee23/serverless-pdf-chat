@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import DocumentsList2 from './DocumentsList2';
 import ChatBox from './ChatBox';
 import { API } from "aws-amplify";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// import { toast, ToastContainer } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
  
  
 interface Conversation {
@@ -191,16 +191,16 @@ function Layout2() {
           }
         );
         console.log('Delete request successful', response);
-        toast.success('file is deleted!', {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        // toast.success('file is deleted!', {
+        //   position: "top-right",
+        //   autoClose: 5000,
+        //   hideProgressBar: false,
+        //   closeOnClick: true,
+        //   pauseOnHover: true,
+        //   draggable: true,
+        //   progress: undefined,
+        //   theme: "light",
+        // });
         fetchData()
         getAllFiles()
       } catch (error) {
