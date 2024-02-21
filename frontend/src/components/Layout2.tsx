@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react'
 import DocumentsList2 from './DocumentsList2';
 import ChatBox from './ChatBox';
 import { API } from "aws-amplify";
-
-
- interface Conversation{
-  messages:any[];
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+ 
+ 
+interface Conversation {
+  messages: any[];
 }
  
 function Layout2() {
@@ -13,7 +15,7 @@ function Layout2() {
   // console.log("s boardid", storedBoardId);
   const [files, setFiles] = useState([])
   const [docs, setDocs] = useState([]);
-  const [conversation, setConversation] = useState<Conversation>({messages: [] });
+  const [conversation, setConversation] = useState < Conversation > ({ messages: [] });
   const [messageStatus, setMessageStatus] = useState < string > ("idle");
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = React.useState < string > ("idle");
@@ -150,6 +152,65 @@ function Layout2() {
     setPrompt(event.target.value);
   };
  
+  const handleDeletchat = async (conversationIdToDelete) => {
+    console.log("Conversation ID to delete", conversationIdToDelete);
+ 
+    const fetchData = async (conversationId) => {
+      try {
+        const response = await API.del(
+          'serverless-pdf-chat',
+          '/Delete_History',
+          {
+            body: {
+              conversation_id: conversationId,
+            },
+          }
+        );
+        console.log('Delete request successful', response);
+        setConversation({ messages: [] })
+      } catch (error) {
+        console.error('Error during delete request:', error);
+      }
+    };
+ 
+    fetchData(conversationIdToDelete);
+  };
+ 
+  const handleDeletFull = async (conversationIdToDeleteFull, documentIdToDeletFull) => {
+ 
+    const fetchData3 = async (conversationIdToDeleteFull, documentIdToDeletFull) => {
+      try {
+        const response = await API.del(
+          'serverless-pdf-chat',
+          '/Delete_Full',
+          {
+            body: {
+              conversation_id: conversationIdToDeleteFull,
+              document_id: documentIdToDeletFull,
+            },
+          }
+        );
+        console.log('Delete request successful', response);
+        toast.success('file is deleted!', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        fetchData()
+        getAllFiles()
+      } catch (error) {
+        console.error('Error during delete request:', error);
+      }
+    };
+ 
+    fetchData3(conversationIdToDeleteFull, documentIdToDeletFull);
+  };
+ 
   return (
     <>
       <div className="main_container">
@@ -158,6 +219,8 @@ function Layout2() {
             fileData={files}
             handlestartchatParent={handlestartchatParent}
             documents={docs}
+            handleDeletchat={handleDeletchat}
+            handleDeletFull={handleDeletFull}
           />
         </div>
         <div className='chat_con'>
