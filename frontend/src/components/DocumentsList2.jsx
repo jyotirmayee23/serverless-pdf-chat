@@ -183,11 +183,11 @@ function DocumentsList2({
                     <div className='buttons_div bg-white rounded-sm py-1 px-2'>
                       <div className='flex text-center hover:bg-sky-100'>
                         <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
-                          onClick={(e) => handleDeletchat(file.conversationid)}>Delet chat</p>
+                          onClick={(e) => handleDeletchat(file.conversationid)}>Delete chat</p>
                       </div>
                       <div className='flex hover:bg-sky-100'>
-                        <p className='cursor-pointer text-sm text-[12px] text-[#434343] mx-auto'
-                          onClick={(e) => handleDeletFull(file.conversationid, file.documentid)}>Delet file</p>
+                        <p className='cursor-pointer text-[12px] tracking-wide text-[#434343] mx-auto'
+                          onClick={(e) => handleDeletFull(file.conversationid, file.documentid)}>Delete file</p>
                       </div>
                     </div>
                   )}
