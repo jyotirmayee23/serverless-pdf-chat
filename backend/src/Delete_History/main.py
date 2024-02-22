@@ -25,18 +25,22 @@ def clear_history(conversation_id):
 def lambda_handler(event, context):
     # Parse the body of the event as JSON
     body = json.loads(event['body'])
+    print("conversations body " , body)
 
-    # Extract conversation_id from the parsed body
-    conversation_id = body.get('conversation_id')
-    
-    if not conversation_id:
+    # Extract conversation_ids from the parsed body
+    conversation_ids = body.get('conversation_ids')
+    print("conversation ids " , conversation_ids)
+
+    if not conversation_ids or not isinstance(conversation_ids, list):
         return {
             "statusCode": 400,
-            "body": json.dumps({"message": "Bad Request. Conversation ID is required."})
+            "body": json.dumps({"message": "Bad Request. Conversation IDs must be provided in an array."})
         }
 
-    # Clear the "History" field within the conversation identified by conversation_id
-    success = clear_history(conversation_id)
+    success = True
+    for conversation_id in conversation_ids:
+        # Clear the "History" field within each conversation identified by conversation_id
+        success &= clear_history(conversation_id)
 
     if success:
         return {
@@ -47,10 +51,10 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "*",
             },
-            "body": json.dumps({"message": "History cleared from conversation successfully!"})
+            "body": json.dumps({"message": "History cleared from conversations successfully!"})
         }
     else:
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Failed to clear history from conversation."})
+            "body": json.dumps({"message": "Failed to clear history from one or more conversations."})
         }
