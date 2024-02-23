@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react'
 import DocumentsList2 from './DocumentsList2';
 import ChatBox from './ChatBox';
 import { API } from "aws-amplify";
-// import { toast, ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
+import { RxCross1 } from "react-icons/rx";
  
  
 interface Conversation {
@@ -19,6 +18,16 @@ function Layout2() {
   const [messageStatus, setMessageStatus] = useState < string > ("idle");
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = React.useState < string > ("idle");
+  const [showFileViewer, setShowFileViewer] = useState(false);
+  const [fileToView, setFileToView] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [reload, setReload]= useState(false)
+ 
+  const handleviewFile = (public_url) => {
+    const googleDocsViewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(public_url)}&embedded=true`;
+    setFileToView(googleDocsViewerUrl);
+    setShowModal(true);
+  };
  
  
  
@@ -141,7 +150,7 @@ function Layout2() {
  
   }
  
-  const handleKeyPress = (event, conversationId, filename, prompt, documentId) => {
+  const handleKeyPress = (event: { key: string; }, conversationId: any, filename: any, prompt: any, documentId: any) => {
     console.log("func called")
     if (event.key === "Enter") {
       submitMessage(conversationId, filename, prompt, documentId);
@@ -152,17 +161,17 @@ function Layout2() {
     setPrompt(event.target.value);
   };
  
-  const handleDeletchat = async (conversationIdToDelete) => {
-    console.log("Conversation ID to delete", conversationIdToDelete);
- 
-    const fetchData = async (conversationId) => {
+  const handleDeletchat = async (conversationIdToDelete: any) => {
+    // console.log("Conversation ID to delete", conversationIdToDelete);
+    alert("Do you want to delete your chat history ?")
+    const fetchData = async (conversationId: any) => {
       try {
         const response = await API.del(
           'serverless-pdf-chat',
           '/Delete_History',
           {
             body: {
-              conversation_id: conversationId,
+              conversation_ids: [conversationId],
             },
           }
         );
@@ -176,33 +185,24 @@ function Layout2() {
     fetchData(conversationIdToDelete);
   };
  
-  const handleDeletFull = async (conversationIdToDeleteFull, documentIdToDeletFull) => {
- 
-    const fetchData3 = async (conversationIdToDeleteFull, documentIdToDeletFull) => {
+  const handleDeletFull = async (conversationIdToDeleteFull: any, documentIdToDeletFull: any) => {
+    alert("Do you want to deactivate your file ?")
+    const fetchData3 = async (conversationIdToDeleteFull: any, documentIdToDeletFull: any) => {
       try {
         const response = await API.del(
           'serverless-pdf-chat',
           '/Delete_Full',
           {
             body: {
-              conversation_id: conversationIdToDeleteFull,
+              conversation_ids: [conversationIdToDeleteFull],
               document_id: documentIdToDeletFull,
             },
           }
         );
         console.log('Delete request successful', response);
-        // toast.success('file is deleted!', {
-        //   position: "top-right",
-        //   autoClose: 5000,
-        //   hideProgressBar: false,
-        //   closeOnClick: true,
-        //   pauseOnHover: true,
-        //   draggable: true,
-        //   progress: undefined,
-        //   theme: "light",
-        // });
         fetchData()
         getAllFiles()
+        setReload(true)
       } catch (error) {
         console.error('Error during delete request:', error);
       }
@@ -213,27 +213,45 @@ function Layout2() {
  
   return (
     <>
-      <div className="main_container">
-        <div className="files_con">
-          <DocumentsList2
-            fileData={files}
-            handlestartchatParent={handlestartchatParent}
-            documents={docs}
-            handleDeletchat={handleDeletchat}
-            handleDeletFull={handleDeletFull}
-          />
+      <div className='relative'>
+        {/* This div will serve as the reference point for positioning the modal */}
+        <div className="parent-container flex">
+          <div className="files_con">
+            <DocumentsList2
+              fileData={files}
+              handlestartchatParent={handlestartchatParent}
+              documents={docs}
+              handleDeletchat={handleDeletchat}
+              handleDeletFull={handleDeletFull}
+              handleviewFile={handleviewFile}
+              reload={reload}
+            />
+          </div>
+          <div className='chat_con'>
+            <ChatBox
+              handleKeyPress={handleKeyPress}
+              prompt={prompt}
+              conversation={conversation}
+              submitMessage={submitMessage}
+              loading={loading}
+              messageStatus={messageStatus}
+              handlePromptChange={handlePromptChange}
+            />
+          </div>
         </div>
-        <div className='chat_con'>
-          <ChatBox
-            handleKeyPress={handleKeyPress}
-            prompt={prompt}
-            conversation={conversation}
-            submitMessage={submitMessage}
-            loading={loading}
-            messageStatus={messageStatus}
-            handlePromptChange={handlePromptChange}
-          />
-        </div>
+ 
+        {/* Modal is positioned absolutely relative to the parent-container */}
+        {showModal && (
+          <div className="modal absolute inset-0 flex items-center justify-center">
+            <div className="modal-content bg-white p-4 rounded shadow-lg">
+              <button
+                onClick={() => setShowModal(false)}
+                className='bg-blue-500 text-white py-2 px-4 mb-2 rounded-sm'
+              ><RxCross1 /></button>
+              <iframe src={fileToView} width="100%" height="600px" />
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
