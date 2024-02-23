@@ -8,42 +8,42 @@ import {
   XCircleIcon,
   ArrowLeftCircleIcon,
 } from "@heroicons/react/24/outline";
-
+ 
 const DocumentUploader: React.FC = () => {
-  const [inputStatus, setInputStatus] = useState<string>("idle");
-  const [buttonStatus, setButtonStatus] = useState<string>("ready");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+  const [inputStatus, setInputStatus] = useState < string > ("idle");
+  const [buttonStatus, setButtonStatus] = useState < string > ("ready");
+  const [selectedFile, setSelectedFile] = useState < File | null > (null);
+ 
   useEffect(() => {
     if (selectedFile) {
       const fileType = selectedFile.type;
       const allowedTypes = ["application/pdf", "text/csv", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
       if (allowedTypes.includes(fileType)) {
-      // if (fileType === "application/pdf" || fileType === "text/csv") {
+        // if (fileType === "application/pdf" || fileType === "text/csv") {
         setInputStatus("valid");
       } else {
         setSelectedFile(null);
       }
     }
   }, [selectedFile]);
-  
+ 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     setSelectedFile(file || null);
   };
-  
+ 
   const uploadFile = async () => {
     setButtonStatus("uploading");
-  
+ 
     if (selectedFile) {
-         const contentType =
-           selectedFile.type === "application/pdf" ? "application/pdf" :
-           selectedFile.type === "text/csv" ? "text/csv" :
-           selectedFile.type === "text/plain" ? "text/plain" :
-           selectedFile.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "";
+      const contentType =
+        selectedFile.type === "application/pdf" ? "application/pdf" :
+          selectedFile.type === "text/csv" ? "text/csv" :
+            selectedFile.type === "text/plain" ? "text/plain" :
+              selectedFile.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "";
       // const contentType =
       //   selectedFile.type === "application/pdf" ? "application/pdf" : "text/csv";
-  
+ 
       await API.get("serverless-pdf-chat", "/generate_presigned_url", {
         headers: { "Content-Type": "application/json" },
         queryStringParameters: {
@@ -60,13 +60,13 @@ const DocumentUploader: React.FC = () => {
       });
     } // Add this closing bracket
   };
-  
+ 
   const resetInput = () => {
     setSelectedFile(null);
     setInputStatus("idle");
     setButtonStatus("ready");
   };
-
+ 
   return (
     <div>
       <h2 className="text-2xl font-bold pb-4">Add document</h2>
@@ -78,20 +78,20 @@ const DocumentUploader: React.FC = () => {
           >
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
               <CloudArrowUpIcon className="w-12 h-12 mb-3 text-gray-400" />
-
+ 
               <p className="mb-2 text-sm text-gray-500">
                 <span className="font-semibold">Click to upload</span> your
                 document
               </p>
               <p className="text-xs text-gray-500">Only .pdf , .csv , .txt , .docx accepted</p>
             </div>
-
+ 
             <input
               onChange={handleFileChange}
               id="dropzone-file"
               type="file"
-              accept=".pdf, .csv, .txt, .docx,"
               className="hidden"
+              accept=".pdf, .csv, .txt, .docx,"
             />
           </label>
         </div>
@@ -197,5 +197,5 @@ const DocumentUploader: React.FC = () => {
     </div>
   );
 };
-
+ 
 export default DocumentUploader;
