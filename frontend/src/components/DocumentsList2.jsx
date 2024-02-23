@@ -4,6 +4,7 @@ import { BsThreeDots } from "react-icons/bs";
 import Loading from "../../public/loading-dots.svg";
 import { RiDeleteBin7Fill } from "react-icons/ri";
 import { FaFileCircleXmark } from "react-icons/fa6";
+import Popup from 'reactjs-popup';
  
 function DocumentsList2({
   fileData,
@@ -12,6 +13,8 @@ function DocumentsList2({
   handleUploadFileToMonday,
   handleDeletchat,
   handleDeletFull,
+  handleviewFile,
+  reload,
 }) {
   const [showFiles, setShowFiles] = useState([]);
   const [metaState, setMetaState] = useState('');
@@ -20,10 +23,6 @@ function DocumentsList2({
   const [processing, setProcessing] = useState(null);
   const [clickedFileIndex, setClickedFileIndex] = useState(null);
   const [clickedFileId, setClickedFileId] = useState(null);
- 
-  const handleThreedotsClick = (filename) => {
-    setClickedFileId(filename === clickedFileId ? null : filename);
-  };
  
  
   useEffect(() => {
@@ -38,7 +37,7 @@ function DocumentsList2({
   // Extract the logic into a separate function
   const updateShowFiles = (fileData, documents) => {
     const updatedShowFiles = fileData
-      .filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.csv'))
+      .filter(file => file.name.toLowerCase().endsWith('.pdf') || file.name.toLowerCase().endsWith('.csv') || file.name.toLowerCase().endsWith('.txt') || file.name.toLowerCase().endsWith('.docx'))
       .map(file => {
         const existsInDocuments = documents.some(doc => doc.filename === file.name);
         const matchingDocument = existsInDocuments ? documents.find(doc => doc.filename === file.name) : null;
@@ -60,7 +59,7 @@ function DocumentsList2({
  
   useEffect(() => {
     updateShowFiles(fileData, documents);
-  }, [fileData, documents]);
+  }, [fileData, documents, reload]);
  
   const handleReadyForChat = async (name, public_url) => {
     setProcessing(name);
@@ -88,6 +87,7 @@ function DocumentsList2({
       setProcessing(null);
     }
   };
+ 
  
  
  
@@ -121,9 +121,6 @@ function DocumentsList2({
     return `${sizeInKB} KB`;
   };
  
- 
- 
- 
   const getBackgroundColor = (file) => {
     if (file.meta === 'meta') {
       return '#E5E7EB';
@@ -148,7 +145,7 @@ function DocumentsList2({
               key={index}
               style={{ backgroundColor: file.backgroundColor || getBackgroundColor(file) }}
             >
-              <div className='py-1 px-3 w-[70%]'>
+              <div className='py-1 px-3 w-[95%]'>
                 <div className='flex justify-between'>
                   <p className='file_name font-light'>{file.name}</p>
                 </div>
@@ -162,11 +159,11 @@ function DocumentsList2({
                   </div>
                 )}
                 {file.meta === 'meta' && (
-                  <div className='flex align-middle p-0 w-[100%]'>
-                    <div className='py-1 w-[25%]'>
+                  <div className='flex align-middle justify-between p-0 w-[100%]'>
+                    <div className='py-1 '>
                       <p className='file_size'>{formatFileSize(file.filesize)}</p>
                     </div>
-                    <div className='w-[75%] flex justify-start'>
+                    <div className='flex justify-end'>
                       <button className='ready_to_chat_btn rounded-sm' onClick={(e) => handlestartchat(file.documentid, file.conversationid)}>
                         <p className='tracking-wider text-sm'>start conversation</p>
                       </button>
@@ -174,24 +171,54 @@ function DocumentsList2({
                   </div>
                 )}
               </div>
-              <div className='w-[30%]'>
-                <div className='flex justify-end'>
+              <div className='w-[5%] flex justify-end'>
+                {/* <div className='flex justify-end'>
                   <p className='cursor-pointer text-end' onClick={() => handleThreedotsClick(file.name)}><BsThreeDots /></p>
-                </div>
-                <div className='relative'>
+                </div> */}
+                {/* <div className='relative'>
                   {file.meta === 'meta' && clickedFileId !== null && file.name === clickedFileId && (
                     <div className='buttons_div bg-white rounded-sm py-1 px-2'>
                       <div className='flex text-center hover:bg-sky-100'>
                         <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
-                          onClick={(e) => handleDeletchat(file.conversationid)}>Delete chat</p>
+                          onClick={(e) => handleDeletchat(file.conversationid)}>Delet chat</p>
                       </div>
                       <div className='flex hover:bg-sky-100'>
-                        <p className='cursor-pointer text-[12px] tracking-wide text-[#434343] mx-auto'
-                          onClick={(e) => handleDeletFull(file.conversationid, file.documentid)}>Delete file</p>
+                        <p className='cursor-pointer  text-[12px] text-[#434343] mx-auto'
+                          onClick={(e) => handleDeletFull(file.conversationid, file.documentid)}>Delet file</p>
+                      </div>
+                      <div className='flex hover:bg-sky-100'>
+                        <p className='cursor-pointer  text-[12px] text-[#434343] mx-auto'
+                          onClick={(e) => handleviewFile(file.public_url)}>view File</p>
                       </div>
                     </div>
                   )}
-                </div>
+                </div> */}
+                <Popup
+                  trigger={<div className="menu-item"> <p><BsThreeDots /></p> </div>}
+                  position="right top"
+                  on="hover"
+                  closeOnDocumentClick
+                  mouseLeaveDelay={300}
+                  mouseEnterDelay={0}
+                  contentStyle={{ padding: '10px', border: 'none', width: 'fit-content', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}
+                  arrow={false}
+                >
+                  <div className="menu w-fit">
+                    <div className="menu-item py-1 px-4 hover:bg-gray-100">
+                      <p
+                        className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343] text-center'
+                        onClick={(e) => handleDeletchat(file.conversationid)}>Delet Chat</p>
+                    </div>
+                    <div className='menu-item py-1 px-4 hover:bg-gray-100'>
+                      <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
+                        onClick={(e) => handleDeletFull(file.conversationid, file.documentid)}>Delet File</p>
+                    </div>
+                    <div className='menu-item py-1 px-4 hover:bg-gray-100'>
+                      <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
+                        onClick={(e) => handleviewFile(file.public_url)}>View File</p>
+                    </div>
+                  </div>
+                </Popup>
               </div>
             </div>
           ))
