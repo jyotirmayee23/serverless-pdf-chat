@@ -1,6 +1,10 @@
 import { Document } from "../common/types";
 import { getDateTime } from "../common/utilities";
 import { filesize } from "filesize";
+import { BsThreeDots } from "react-icons/bs";
+import Popup from 'reactjs-popup';
+import 'reactjs-popup/dist/index.css';
+import { API } from "aws-amplify";
 import {
   DocumentIcon,
   CircleStackIcon,
@@ -9,10 +13,69 @@ import {
   CloudIcon,
   CogIcon,
 } from "@heroicons/react/24/outline";
-
-const DocumentDetail: React.FC<Document> = (document: Document) => {
+import { useEffect } from "react";
+ 
+ 
+ 
+const DocumentDetail: React.FC<Document & { handleDeletFull: (documentId: string, conversationIds: string[]) => void }> = ({ handleDeletFull, ...document }) => {
+  // console.log("document", document)
+ 
+  useEffect(() => {
+  }, [document])
+ 
+  // const handleDeletFull = async (documentId, conversationIds) => {
+  //   // console.log(Array.isArray(conversationIds))
+  //   // console.log("document id", documentId)
+  //   // console.log("conversation ids", conversationIds)
+  //   alert("Do you want to delete this file?")
+  //   const deleteFull = async (documentId, conversationIds) => {
+  //     try {
+  //       const response = await API.del(
+  //         'serverless-pdf-chat',
+  //         '/Delete_Full',
+  //         {
+  //           body: {
+  //             document_id: documentId,
+  //             conversation_ids: conversationIds,
+  //           },
+  //         }
+  //       );
+  //       console.log('Delete request successful', response);
+  //     } catch (error) {
+  //       console.error('Error during delete request:', error);
+  //     }
+  //   };
+ 
+  //   deleteFull(documentId, conversationIds);
+  // }
+ 
   return (
     <>
+      <div className="flex justify-end">
+        <Popup
+          trigger={<div className="menu-item"> <p><BsThreeDots /></p> </div>}
+          position="right top"
+          on="hover"
+          closeOnDocumentClick
+          mouseLeaveDelay={300}
+          mouseEnterDelay={0}
+          contentStyle={{ padding: '0px', border: 'none' }}
+          arrow={false}
+        >
+          <div className="menu">
+            <div className="menu-item py-1 px-2">
+              <p
+                className="text-sm"
+                onClick={() => handleDeletFull(document.documentid, document.conversations.map(conv => conv.conversationid))}>
+                Delete File
+              </p>
+            </div>
+            {/* <div className="menu-item py-1 px-2">
+              <p className="text-sm ">Delete File</p>
+            </div> */}
+          </div>
+        </Popup>
+      </div>
       <h3 className="text-center mb-3 text-lg font-bold tracking-tight text-gray-900">
         {document.filename}
       </h3>
@@ -57,5 +120,5 @@ const DocumentDetail: React.FC<Document> = (document: Document) => {
     </>
   );
 };
-
+ 
 export default DocumentDetail;
