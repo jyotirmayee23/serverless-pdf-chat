@@ -5,22 +5,45 @@ import DocumentDetail from "./DocumentDetail";
 import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
 import { Document } from "../common/types";
 import Loading from "../../public/loading-grid.svg";
-
+ 
 const DocumentList: React.FC = () => {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [listStatus, setListStatus] = useState<string>("idle");
-
+  const [documents, setDocuments] = useState < Document[] > ([]);
+  const [listStatus, setListStatus] = useState < string > ("idle");
+ 
   const fetchData = async () => {
     setListStatus("loading");
     const documents = await API.get("serverless-pdf-chat", "/doc", {});
     setListStatus("idle");
     setDocuments(documents);
   };
-
+  const handleDeletFull = async (documentId, conversationIds) => {
+    alert("Do you want to delete this file?")
+    const deleteFull = async (documentId, conversationIds) => {
+      try {
+        const response = await API.del(
+          'serverless-pdf-chat',
+          '/Delete_Full',
+          {
+            body: {
+              document_id: documentId,
+              conversation_ids: conversationIds,
+            },
+          }
+        );
+        console.log('Delete request successful', response);
+        fetchData()
+      } catch (error) {
+        console.error('Error during delete request:', error);
+      }
+    };
+ 
+    deleteFull(documentId, conversationIds);
+  }
+ 
   useEffect(() => {
     fetchData();
   }, []);
-
+ 
   return (
     <div>
       <div className="flex justify-between pt-6 pb-4">
@@ -31,9 +54,8 @@ const DocumentList: React.FC = () => {
           className="text-gray-700 border border-gray-700 hover:bg-gray-700 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm p-2 text-center inline-flex items-center"
         >
           <ArrowPathRoundedSquareIcon
-            className={`w-5 h-5 ${
-              listStatus === "loading" ? "animate-spin" : ""
-            }`}
+            className={`w-5 h-5 ${listStatus === "loading" ? "animate-spin" : ""
+              }`}
           />
         </button>
       </div>
@@ -46,7 +68,10 @@ const DocumentList: React.FC = () => {
               key={document.documentid}
               className="block p-6 bg-white border border-gray-200 rounded hover:bg-gray-100"
             >
-              <DocumentDetail {...document} />
+              <DocumentDetail
+                {...document}
+                handleDeletFull={handleDeletFull}
+              />
             </Link>
           ))}
       </div>
@@ -64,5 +89,5 @@ const DocumentList: React.FC = () => {
     </div>
   );
 };
-
+ 
 export default DocumentList;
