@@ -80,8 +80,9 @@ def lambda_handler(event, context):
     user_id = claims['cognito:username']
     
     body = json.loads(event['body'])
-    conversation_ids = body.get('conversation_ids', [])
     document_id = body.get('document_id')
+    conversation_ids = body.get('conversation_ids', [])
+
     print("conversation_ids" , conversation_ids)
     print("document_id" , document_id)
 
@@ -91,7 +92,11 @@ def lambda_handler(event, context):
             "body": json.dumps({"message": "Bad Request. User ID, Document ID, and Conversation IDs are required."})
         }
 
-    success_clear_session = clear_session(conversation_id)
+    success_clear_session = True
+
+    for conversation_id in conversation_ids:
+        success_clear_session = success_clear_session and clear_session(conversation_id)
+
     success_delete_document = delete_document(user_id, document_id)
 
     if success_clear_session and success_delete_document:
@@ -103,10 +108,10 @@ def lambda_handler(event, context):
                 "Access-Control-Allow-Origin": "*",
                 "Access-Control-Allow-Methods": "*",
             },
-            "body": json.dumps({"message": "Session cleared, document deleted, and S3 objects removed successfully!"})
+            "body": json.dumps({"message": "Sessions cleared, document deleted, and S3 objects removed successfully!"})
         }
     else:
         return {
             "statusCode": 500,
-            "body": json.dumps({"message": "Failed to clear session, delete document, or remove S3 objects."})
+            "body": json.dumps({"message": "Sessions cleared, document deleted, and  S3 objects removed successfully!"})
         }
