@@ -29,7 +29,11 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
   return (
     <div className="col-span-4 h-full">
       <div className="bg-gray-100 p-5">
-        <DocumentDetail {...conversation.document} />
+{/*         <DocumentDetail {...conversation.document} /> */}
+        <DocumentDetail
+          {...conversation.document}
+          handleDeletFull={() => { }}
+        />
       </div>
       <div className="px-3 pt-3 pb-5">
         {conversationListStatus === "idle" && (
