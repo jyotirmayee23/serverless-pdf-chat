@@ -80,13 +80,15 @@ def lambda_handler(event, context):
     user_id = claims['cognito:username']
     
     body = json.loads(event['body'])
-    conversation_id = body.get('conversation_id')
+    conversation_ids = body.get('conversation_ids', [])
     document_id = body.get('document_id')
+    print("conversation_ids" , conversation_ids)
+    print("document_id" , document_id)
 
-    if not conversation_id or not user_id or not document_id:
+    if not user_id or not document_id or not conversation_ids:
         return {
             "statusCode": 400,
-            "body": json.dumps({"message": "Bad Request. Conversation ID, User ID, and Document ID are required."})
+            "body": json.dumps({"message": "Bad Request. User ID, Document ID, and Conversation IDs are required."})
         }
 
     success_clear_session = clear_session(conversation_id)
