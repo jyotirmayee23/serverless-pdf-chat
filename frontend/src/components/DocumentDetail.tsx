@@ -15,7 +15,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { useEffect } from "react";
  
- 
+ function DocumentsList2({
+  handleviewFile,
+})
  
 const DocumentDetail: React.FC<Document & { handleDeletFull: (documentId: string, conversationIds: string[]) => void }> = ({ handleDeletFull, ...document }) => {
   // console.log("document", document)
