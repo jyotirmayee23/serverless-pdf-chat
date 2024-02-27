@@ -89,7 +89,7 @@ const DocumentDetail: React.FC<Document & { handleDeletFull: (documentId: string
             <div className="menu-item py-1 px-2">
               <p
                 className="text-sm"
-                onClick={(e) => handleviewFile(file.public_url)}>View File
+                onClick={(e) => handleviewFiledocument.s3_object_url}>View File
               </p>
             </div>
             {/* <div className="menu-item py-1 px-2">
