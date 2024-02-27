@@ -75,6 +75,28 @@ const DocumentDetail: React.FC<Document & { handleDeletFull: (documentId: string
             </div> */}
           </div>
         </Popup>
+        <Popup
+          trigger={<div className="menu-item"> <p><BsThreeDots /></p> </div>}
+          position="right top"
+          on="hover"
+          closeOnDocumentClick
+          mouseLeaveDelay={300}
+          mouseEnterDelay={0}
+          contentStyle={{ padding: '0px', border: 'none' }}
+          arrow={false}
+        >
+          <div className="menu">
+            <div className="menu-item py-1 px-2">
+              <p
+                className="text-sm"
+                onClick={(e) => handleviewFile(file.public_url)}>View File
+              </p>
+            </div>
+            {/* <div className="menu-item py-1 px-2">
+              <p className="text-sm ">Delete File</p>
+            </div> */}
+          </div>
+        </Popup>
       </div>
       <h3 className="text-center mb-3 text-lg font-bold tracking-tight text-gray-900">
         {document.filename}
