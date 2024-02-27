@@ -17,7 +17,9 @@ def lambda_handler(event, context):
     user_id = event["requestContext"]["authorizer"]["claims"]["sub"]
 
     response = document_table.query(KeyConditionExpression=Key("userid").eq(user_id))
+    print("response",response)
     items = sorted(response["Items"], key=lambda item: item["created"], reverse=True)
+    print("iems", items)
     for item in items:
         item["conversations"] = sorted(
             item["conversations"], key=lambda conv: conv["created"], reverse=True
