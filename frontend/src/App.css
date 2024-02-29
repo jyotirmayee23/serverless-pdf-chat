@@ -675,3 +675,22 @@ button.start_chat_btn {
   width:  80%;
   height: 100vh;
 }
+
+.modal_exi{
+  position: absolute;
+  top:  5;
+  left:  0;
+  width:  100%;
+  height:  90%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content_exi {
+  background-color: #fff;
+  padding:  20px;
+  border-radius:  5px;
+  box-shadow:  0  4px  6px rgba(0,  0,  0,  0.1);
+  width:  80%;
+  height: auto;
+}
