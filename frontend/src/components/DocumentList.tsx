@@ -6,7 +6,7 @@ import { ArrowPathRoundedSquareIcon } from "@heroicons/react/24/outline";
 import { Document } from "../common/types";
 import Loading from "../../public/loading-grid.svg";
  
-const DocumentList: React.FC = () => {
+const DocumentList: React.FC<{ handleViewFile: (url: string) => void }> = ({ handleViewFile }) => {
   const [documents, setDocuments] = useState < Document[] > ([]);
   const [listStatus, setListStatus] = useState < string > ("idle");
  
@@ -71,6 +71,7 @@ const DocumentList: React.FC = () => {
               <DocumentDetail
                 {...document}
                 handleDeletFull={handleDeletFull}
+                handleViewFile={handleViewFile}
               />
             </Link>
           ))}

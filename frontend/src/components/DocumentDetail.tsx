@@ -17,7 +17,7 @@ import { useEffect } from "react";
  
 
  
-const DocumentDetail: React.FC<Document & { handleDeletFull: (documentId: string, conversationIds: string[]) => void }> = ({ handleDeletFull, ...document }) => {
+const DocumentDetail: React.FC<Document & { handleDeletFull: (documentId: string, conversationIds: string[]) => void, handleViewFile: (url: string) => void }> = ({ handleDeletFull, handleViewFile, ...document }) => {
   // console.log("document", document)
  
   useEffect(() => {
@@ -70,9 +70,16 @@ const DocumentDetail: React.FC<Document & { handleDeletFull: (documentId: string
                 Delete File
               </p>
             </div>
-            {/* <div className="menu-item py-1 px-2">
-              <p className="text-sm ">Delete File</p>
-            </div> */}
+            {document.s3_object_url && (
+              <div className="menu-item py-1 px-2">
+                <p
+                  className="text-sm"
+                  onClick={() => handleViewFile(document.s3_object_url)}
+                >
+                  View File
+                </p>
+              </div>
+            )}
           </div>
         </Popup>
       </div>
