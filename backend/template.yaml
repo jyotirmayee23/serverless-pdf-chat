@@ -51,10 +51,10 @@ Resources:
             AllowedOrigins:
               - "*"
       PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
 
   DocumentBucketPolicy:
     Type: "AWS::S3::BucketPolicy"
@@ -73,6 +73,12 @@ Resources:
             Condition:
               Bool:
                 "aws:SecureTransport": "false"
+          - Sid: Stmt1709196849531
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource:
+              - !Sub "arn:aws:s3:::${DocumentBucket}/*"
       Bucket: !Ref DocumentBucket
 
   EmbeddingQueue:
@@ -556,3 +562,5 @@ Outputs:
     Value: !Ref CognitoUserPoolClient
   ApiGatewayBaseUrl:
     Value: !Sub "https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"
+  AmplifyAppId:
+    Value: !GetAtt AmplifyApp.AppId

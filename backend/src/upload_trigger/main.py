@@ -25,15 +25,20 @@ def lambda_handler(event, context):
     user_id = split[0]
     file_name = split[1]
 
-    print("file name ", file_name)
-    print("key ", key)
+    # file_name_encoded = urllib.parse.quote(file_name)
+    file_name_encoded = file_name.replace(" ", "+")
+    print("file_name_encoded", file_name_encoded)
+
+    # print("file name ", file_name)
+    # print("key ", key)
 
     document_id = shortuuid.uuid()
 
     s3.download_file(BUCKET, key, f"/tmp/{file_name}")
 
     # Construct the S3 object URL
-    s3_object_url = f"https://{BUCKET}.s3.amazonaws.com/{key}"
+    s3_object_url = f"https://{BUCKET}.s3.amazonaws.com/{user_id}/{file_name_encoded}/{file_name_encoded}"
+
 
     print("s3 object url" , s3_object_url)
 
