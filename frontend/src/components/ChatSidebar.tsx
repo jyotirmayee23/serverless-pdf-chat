@@ -33,6 +33,7 @@ const ChatSidebar: React.FC<ChatSidebarProps> = ({
         <DocumentDetail
           {...conversation.document}
           handleDeletFull={() => { }}
+          handleViewFile = {()=> { } }
         />
       </div>
       <div className="px-3 pt-3 pb-5">
