@@ -163,7 +163,9 @@ function Layout2() {
  
   const handleDeletchat = async (conversationIdToDelete: any) => {
     // console.log("Conversation ID to delete", conversationIdToDelete);
-    alert("Do you want to delete your chat history ?")
+    if (!window.confirm("Do you want to delete this file?")) {
+      return;
+    }
     const fetchData = async (conversationId: any) => {
       try {
         const response = await API.del(
