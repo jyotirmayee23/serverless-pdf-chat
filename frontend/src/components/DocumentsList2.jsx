@@ -187,7 +187,7 @@ function DocumentsList2({
                 <div className='my-auto w-[40%]'>
                   <div className='ready_to_chat_btn rounded-sm'>
                     <button className='my-auto' onClick={(e) => handlestartchat(file.documentid, file.conversationid)}>
-                      <p className='tracking-wider text-sm text-center text-[11px] font-semibold'>start conversation</p>
+                      <p className='tracking-wider text-center text-[11px] font-semibold'>start conversation</p>
                     </button>
                   </div>
                 </div>
