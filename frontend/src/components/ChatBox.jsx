@@ -35,7 +35,7 @@ function ChatBox({
     }
   }, [conversation, messageStatus]);
   return (
-    <div className="flex flex-col justify-between h-full overflow-y-auto col-span-8 p-5 border-l border-gray-200">
+    <div className="flex flex-col justify-between h-full overflow-y-auto col-span-8 p-5">
       <div className="pb-5">
         <div className="grid gap-5">
           {conversation.messages.map((message, i) => (
