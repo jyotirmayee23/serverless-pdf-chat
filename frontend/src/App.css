@@ -37,7 +37,7 @@ html {
   height: 100vh;
   overflow-y: auto;
   padding: 10px 10px;
-  /* border-right: 2px solid #F3F4F6; */
+  border-right: 2px solid #F3F4F6;
 }
 .clicked .file_size{
   color: white;
@@ -45,17 +45,18 @@ html {
 .clicked .file_name{
   color: white;
 }
-.clicked .ready_to_chat_btn p{
+.clicked .ready_to_chat_btn {
   color: #323338;
+  background-color: white;
 }
 .doc_heading {
     color: #434343;
     font-size: 21px;
-    font-weight: 700;
+    /* font-weight: 700; */
     text-align: start;
     margin: 10px 0px;
     font-size: 18px;
-    font-weight: 500;
+    /* font-weight: 500; */
 }
  
 .files_con {
@@ -85,7 +86,22 @@ html {
   margin-bottom: 10px;
   position: relative;
 }
+.activate_btn{
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+}
  
+.icon-circle {
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px; /* Adjust the size as needed */
+  height: 35px; /* Adjust the size as needed */
+ }
+ .file_icon{
+  font-size: 22px;
+ }
  
 .file_con_1 {
   width: 80%;
@@ -101,7 +117,7 @@ html {
   height: 100%;
   background-color: rgba(241, 241, 241, 0.7);
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   color: white;
   padding-right: 5px;
@@ -175,14 +191,17 @@ html {
   cursor: pointer;
 }
 .ready_to_chat_btn{
-  color: #323338;
   cursor: pointer;
-  background-color: rgb(227, 250, 227);
-  padding: 0px 10px;
-  font-size: 14px;
-  margin-top: 0px;
-  margin-left: 0px;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  background-color: #0073EA;
+  padding: 0px 0px;
+  /* font-size: 10px; */
+  color: white;
+  border-radius: 4px;
+  text-align: center;
+  /* width: fit-content; */
+  justify-content: center;
+  margin-right: 2px;
+ 
 }
  
 .file_name {
@@ -191,15 +210,16 @@ html {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 50%;
+  width: 80%;
   font-size: 15px;
   margin-top: 0px;
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
+  font-weight: 600;
 }
  
 .file_size,
 .file_pages {
-  font-size: 14px;
+  font-size: 12px;
   color: #434343;
   margin-top: 0px;
 }
@@ -660,7 +680,17 @@ button.start_chat_btn {
   left:  0;
   width:  100%;
   height:  100%;
-  background-color: rgba(0,  0,  0,  0.5); /* Semi-transparent background */
+  /* background-color: rgba(0,  0,  0,  0.5); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal_exi{
+  position: absolute;
+  top:  5;
+  left:  0;
+  width:  100%;
+  height:  90%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -671,20 +701,8 @@ button.start_chat_btn {
   padding:  20px;
   border-radius:  5px;
   box-shadow:  0  4px  6px rgba(0,  0,  0,  0.1);
-  /* Adjust width and height as needed */
   width:  80%;
   height: 100vh;
-}
-
-.modal_exi{
-  position: absolute;
-  top:  5;
-  left:  0;
-  width:  100%;
-  height:  90%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .modal-content_exi {
   background-color: #fff;
