@@ -174,7 +174,7 @@ function DocumentsList2({
               </div>
               <div className='py-[5px] px-3  w-[45%]'>
                 <div className=''>
-                  <p className='file_name' data-tip={file.name}><ReactTooltip place="top" type="dark" effect="float" />>{file.name}</p>
+                  <p className='file_name' data-tip={file.name}><ReactTooltip place="top" type="dark" effect="float" />{file.name}</p>
                 </div>
                 {file.meta === 'meta' && (
                   <div className=''>
