@@ -9,6 +9,7 @@ import { MdTextSnippet } from "react-icons/md";
 import { PiFilesFill } from "react-icons/pi";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 
+
 function DocumentsList2({
   fileData,
   handlestartchatParent,
@@ -168,8 +169,8 @@ function DocumentsList2({
               </div>
               <div className='py-[5px] px-3  w-[45%]'>
                 <div className=''>
-                  <p className='file_name' data-tip={file.name}>{file.name}</p>
-                  <ReactTooltip place="top" type="dark" effect="float" />
+                  <p className='file_name' data-tooltip-id="my-tooltip-1"}>{file.name}</p>
+                  <ReactTooltip id="my-tooltip-1" place="bottom" content="Hello world! I'm a Tooltip"/>
                 </div>
                 {file.meta === 'meta' && (
                   <div className=''>
