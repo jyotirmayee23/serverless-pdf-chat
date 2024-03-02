@@ -7,6 +7,7 @@ import { FaFilePdf, FaFileCsv } from 'react-icons/fa';
 import { FaFileWord } from "react-icons/fa";
 import { MdTextSnippet } from "react-icons/md";
 import { PiFilesFill } from "react-icons/pi";
+import { Tooltip as ReactTooltip } from 'react-tooltip';
  
 function DocumentsList2({
   fileData,
