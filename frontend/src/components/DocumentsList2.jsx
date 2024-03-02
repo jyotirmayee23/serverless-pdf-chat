@@ -8,7 +8,7 @@ import { FaFileWord } from "react-icons/fa";
 import { MdTextSnippet } from "react-icons/md";
 import { PiFilesFill } from "react-icons/pi";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
- 
+
 function DocumentsList2({
   fileData,
   handlestartchatParent,
@@ -26,17 +26,15 @@ function DocumentsList2({
   const [processing, setProcessing] = useState(null);
   const [clickedFileIndex, setClickedFileIndex] = useState(null);
   const [clickedFileId, setClickedFileId] = useState(null);
- 
- 
+
   useEffect(() => {
     const interval = setInterval(() => {
       setLoadingDots((prevDots) => (prevDots + 1) % 3);
     }, 500);
- 
+
     return () => clearInterval(interval);
   }, []);
- 
- 
+
   // Extract the logic into a separate function
   const updateShowFiles = (fileData, documents) => {
     const updatedShowFiles = fileData
@@ -44,7 +42,7 @@ function DocumentsList2({
       .map(file => {
         const existsInDocuments = documents.some(doc => doc.filename === file.name);
         const matchingDocument = existsInDocuments ? documents.find(doc => doc.filename === file.name) : null;
- 
+
         return {
           ...file,
           meta: existsInDocuments ? 'meta' : 'nometa',
@@ -54,17 +52,16 @@ function DocumentsList2({
           conversationid: matchingDocument?.conversations[0].conversationid || null,
         };
       });
- 
+
     setShowFiles(updatedShowFiles);
     const hasCommonFile = updatedShowFiles.some(file => file.meta === 'meta');
     setMetaState(hasCommonFile ? 'meta' : 'nometa');
   };
- 
+
   useEffect(() => {
     updateShowFiles(fileData, documents);
   }, [fileData, documents, reload]);
- 
- 
+
   const handleReadyForChat = async (name, public_url) => {
     setProcessing(name);
     try {
@@ -91,18 +88,15 @@ function DocumentsList2({
       setProcessing(null);
     }
   };
- 
- 
- 
- 
+
   const handlestartchat = (documentid, conversationid) => {
     // Find the index of the file in showFiles array based on documentid and conversationid
     const fileIndex = showFiles.findIndex(file => file.documentid === documentid && file.conversationid === conversationid);
- 
+
     if (fileIndex !== -1) {
       // Update the state variable with the clicked file index
       setClickedFileIndex(fileIndex);
- 
+
       // Remove background color from the previously clicked file
       const updatedShowFiles = showFiles.map((file, index) => ({
         ...file,
@@ -110,21 +104,21 @@ function DocumentsList2({
       }));
       setShowFiles(updatedShowFiles);
     }
- 
+
     // Call your start chat function
     handlestartchatParent(documentid, conversationid);
     // toggleMain();
   };
- 
+
   useEffect(() => {
- 
+
   }, [showFiles, documents]);
- 
+
   const formatFileSize = (sizeInBytes) => {
     const sizeInKB = Math.ceil(sizeInBytes / 1024);
     return `${sizeInKB} KB`;
   };
- 
+
   const getBackgroundColor = (file) => {
     if (file.meta === 'meta') {
       return '#ECEFF8';
@@ -134,7 +128,7 @@ function DocumentsList2({
       return 'lightblue';
     }
   };
- 
+
   const getFileIcon = (filename) => {
     if (filename.endsWith('.pdf')) {
       return <FaFilePdf />;
@@ -148,7 +142,7 @@ function DocumentsList2({
       return null;
     }
   };
- 
+
   return (
     <div>
       <div className='flex align-middle h-12 justify-center'>
@@ -174,7 +168,8 @@ function DocumentsList2({
               </div>
               <div className='py-[5px] px-3  w-[45%]'>
                 <div className=''>
-                  <p className='file_name' data-tip="jyoti"><ReactTooltip place="top" type="dark" effect="float" />{file.name}</p>
+                  <p className='file_name' data-tip={file.name}>{file.name}</p>
+                  <ReactTooltip place="top" type="dark" effect="float" />
                 </div>
                 {file.meta === 'meta' && (
                   <div className=''>
@@ -248,5 +243,5 @@ function DocumentsList2({
     </div >
   );
 }
- 
+
 export default DocumentsList2;
