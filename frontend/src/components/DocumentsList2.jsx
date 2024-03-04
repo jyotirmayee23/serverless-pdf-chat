@@ -211,11 +211,11 @@ function DocumentsList2({
                       <div className="menu-item py-1 px-4 hover:bg-gray-100">
                         <p
                           className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343] text-center'
-                          onClick={(e) => handleDeletchat([file.conversationid])}>Delete Chat</p>
+                          onClick={(e) => handleDeletchat(file.conversationid)}>Delete Chat</p>
                       </div>
                       <div className='menu-item py-1 px-4 hover:bg-gray-100'>
                         <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
-                          onClick={(e) => handleDeletFull([file.conversationid], file.documentid)}>Delete File</p>
+                          onClick={(e) => handleDeletFull(file.conversationid, file.documentid)}>Delete File</p>
                       </div>
                       <div className='menu-item py-1 px-4 hover:bg-gray-100'>
                         <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
