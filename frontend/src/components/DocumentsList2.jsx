@@ -8,8 +8,8 @@ import { FaFileWord } from "react-icons/fa";
 import { MdTextSnippet } from "react-icons/md";
 import { PiFilesFill } from "react-icons/pi";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
-
-
+ 
+ 
 function DocumentsList2({
   fileData,
   handlestartchatParent,
@@ -27,15 +27,16 @@ function DocumentsList2({
   const [processing, setProcessing] = useState(null);
   const [clickedFileIndex, setClickedFileIndex] = useState(null);
   const [clickedFileId, setClickedFileId] = useState(null);
-
+  const [clickedButton, setClickedButton] = useState({ documentid: null, conversationid: null });
+ 
   useEffect(() => {
     const interval = setInterval(() => {
       setLoadingDots((prevDots) => (prevDots + 1) % 3);
     }, 500);
-
+ 
     return () => clearInterval(interval);
   }, []);
-
+ 
   // Extract the logic into a separate function
   const updateShowFiles = (fileData, documents) => {
     const updatedShowFiles = fileData
@@ -43,7 +44,7 @@ function DocumentsList2({
       .map(file => {
         const existsInDocuments = documents.some(doc => doc.filename === file.name);
         const matchingDocument = existsInDocuments ? documents.find(doc => doc.filename === file.name) : null;
-
+ 
         return {
           ...file,
           meta: existsInDocuments ? 'meta' : 'nometa',
@@ -53,16 +54,16 @@ function DocumentsList2({
           conversationid: matchingDocument?.conversations[0].conversationid || null,
         };
       });
-
+ 
     setShowFiles(updatedShowFiles);
     const hasCommonFile = updatedShowFiles.some(file => file.meta === 'meta');
     setMetaState(hasCommonFile ? 'meta' : 'nometa');
   };
-
+ 
   useEffect(() => {
     updateShowFiles(fileData, documents);
   }, [fileData, documents, reload]);
-
+ 
   const handleReadyForChat = async (name, public_url) => {
     setProcessing(name);
     try {
@@ -89,15 +90,15 @@ function DocumentsList2({
       setProcessing(null);
     }
   };
-
+ 
   const handlestartchat = (documentid, conversationid) => {
-    // Find the index of the file in showFiles array based on documentid and conversationid
+    setClickedButton({ documentid, conversationid });
     const fileIndex = showFiles.findIndex(file => file.documentid === documentid && file.conversationid === conversationid);
-
+ 
     if (fileIndex !== -1) {
       // Update the state variable with the clicked file index
       setClickedFileIndex(fileIndex);
-
+ 
       // Remove background color from the previously clicked file
       const updatedShowFiles = showFiles.map((file, index) => ({
         ...file,
@@ -105,21 +106,21 @@ function DocumentsList2({
       }));
       setShowFiles(updatedShowFiles);
     }
-
+ 
     // Call your start chat function
     handlestartchatParent(documentid, conversationid);
     // toggleMain();
   };
-
+ 
   useEffect(() => {
-
+ 
   }, [showFiles, documents]);
-
+ 
   const formatFileSize = (sizeInBytes) => {
     const sizeInKB = Math.ceil(sizeInBytes / 1024);
     return `${sizeInKB} KB`;
   };
-
+ 
   const getBackgroundColor = (file) => {
     if (file.meta === 'meta') {
       return '#ECEFF8';
@@ -129,7 +130,7 @@ function DocumentsList2({
       return 'lightblue';
     }
   };
-
+ 
   const getFileIcon = (filename) => {
     if (filename.endsWith('.pdf')) {
       return <FaFilePdf />;
@@ -143,7 +144,7 @@ function DocumentsList2({
       return null;
     }
   };
-
+ 
   return (
     <div>
       <div className='flex align-middle h-12 justify-center'>
@@ -169,8 +170,13 @@ function DocumentsList2({
               </div>
               <div className='py-[5px] px-3  w-[45%]'>
                 <div className=''>
-                  <p className='file_name' data-tooltip-id="my-tooltip-1">{file.name}</p>
-                  <ReactTooltip id="my-tooltip-1" place="bottom" content={file.name}/>
+                  <p className='file_name' data-tooltip-id={`my-tooltip-${index}`}>{file.name}</p>
+                  <ReactTooltip
+                    id={`my-tooltip-${index}`}
+                    style={{ fontSize: "10px", color: "white" }}
+                    place="top"
+                    content={file.name}
+                  />
                 </div>
                 {file.meta === 'meta' && (
                   <div className=''>
@@ -182,7 +188,7 @@ function DocumentsList2({
               </div>
               {file.meta === 'meta' && (
                 <div className='my-auto w-[40%]'>
-                  <div className='ready_to_chat_btn rounded-sm'>
+                  <div className={`ready_to_chat_btn rounded-sm ${clickedButton.documentid === file.documentid && clickedButton.conversationid === file.conversationid ? 'clicked_btn' : ''}`}>
                     <button className='my-auto' onClick={(e) => handlestartchat(file.documentid, file.conversationid)}>
                       <p className='tracking-wider text-center text-[11px] font-semibold'>start conversation</p>
                     </button>
@@ -196,7 +202,7 @@ function DocumentsList2({
                     position="right top"
                     on="hover"
                     closeOnDocumentClick
-                    mouseLeaveDelay={300}
+                    mouseLeaveDelay={0}
                     mouseEnterDelay={0}
                     contentStyle={{ padding: '10px', border: 'none', width: 'fit-content', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}
                     arrow={false}
@@ -205,11 +211,11 @@ function DocumentsList2({
                       <div className="menu-item py-1 px-4 hover:bg-gray-100">
                         <p
                           className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343] text-center'
-                          onClick={(e) => handleDeletchat([file.conversationid])}>Delet Chat</p>
+                          onClick={(e) => handleDeletchat([file.conversationid])}>Delete Chat</p>
                       </div>
                       <div className='menu-item py-1 px-4 hover:bg-gray-100'>
                         <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
-                          onClick={(e) => handleDeletFull([file.conversationid], file.documentid)}>Delet File</p>
+                          onClick={(e) => handleDeletFull([file.conversationid], file.documentid)}>Delete File</p>
                       </div>
                       <div className='menu-item py-1 px-4 hover:bg-gray-100'>
                         <p className='cursor-pointer mx-auto text-[12px] tracking-wide text-[#434343]'
@@ -227,7 +233,8 @@ function DocumentsList2({
                     {processing === file.name ? <img src={Loading} width={40} className="py-2 mx-2" /> :
                       <p className='activate_btn cursor-pointer text-black bg-white text-[12px] font-semibold py-1 px-2 rounded-md ml-8 w-[125px]' onClick={(e) => handleReadyForChat(file.name, file.public_url)}>
                         click to activate
-                      </p>}
+                      </p>
+                      }
                   </div>
                 </div>
               )}
@@ -244,5 +251,5 @@ function DocumentsList2({
     </div >
   );
 }
-
+ 
 export default DocumentsList2;

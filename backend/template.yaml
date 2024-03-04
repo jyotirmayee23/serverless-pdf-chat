@@ -56,6 +56,41 @@ Resources:
         IgnorePublicAcls: false
         RestrictPublicBuckets: false
 
+  MyOAI:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: "OAI for accessing S3 content via CloudFront"
+
+  MyCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName: !GetAtt DocumentBucket.DomainName
+            Id: MyS3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${MyOAI}"
+        Enabled: true
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: MyS3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+            Headers:
+              - Referer
+
   DocumentBucketPolicy:
     Type: "AWS::S3::BucketPolicy"
     Properties:
@@ -79,8 +114,11 @@ Resources:
             Action: "s3:GetObject"
             Resource:
               - !Sub "arn:aws:s3:::${DocumentBucket}/*"
+            Condition:
+              StringLike:
+                aws:Referer: "${MyCloudFrontDistribution.DomainName}"
       Bucket: !Ref DocumentBucket
-
+              
   EmbeddingQueue:
     Type: AWS::SQS::Queue
     DeletionPolicy: Delete
@@ -222,6 +260,7 @@ Resources:
             RestApiId: !Ref Api
             Path: /generate_presigned_url
             Method: GET
+
   UploadTriggerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -564,3 +603,5 @@ Outputs:
     Value: !Sub "https://${Api}.execute-api.${AWS::Region}.${AWS::URLSuffix}/dev/"
   AmplifyAppId:
     Value: !GetAtt AmplifyApp.AppId
+  CloudFrontDistributionDomain:
+    Value: !GetAtt MyCloudFrontDistribution.DomainName

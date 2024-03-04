@@ -712,3 +712,7 @@ button.start_chat_btn {
   width:  80%;
   height: auto;
 }
+
+.clicked_btn{
+  visibility: hidden;
+}
