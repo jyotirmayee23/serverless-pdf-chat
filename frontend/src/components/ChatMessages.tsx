@@ -43,8 +43,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           onChange={handleModelIdChange}
           className="border border-gray-300 rounded-md p-2"
         >
-          <option value="anthropic.claude-v2:1">anthropic.claude-v2:1</option>
-          <option value="anthropic.claude-v2">anthropic.claude-v2</option>
+          <option value="anthropic.claude-3-haiku-20240307-v1:0">Claude 3 Haiku</option>
+          <option value="anthropic.claude-3-sonnet-20240229-v1:0">Claude 3 Sonnet</option>
           <option value="ai21.j2-mid-v1">ai21.j2-mid-v1</option>
         </select>
       </div>

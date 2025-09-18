@@ -1,0 +1,8 @@
+SQLAlchemy==2.0.43
+langchain-community==0.3.29
+numpy==1.26.4
+pandas==2.2.2  
+PyMySQL
+openpyxl
+boto3
+aws-lambda-powertools

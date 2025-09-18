@@ -22,6 +22,7 @@ const DocumentUploader: React.FC = () => {
         "application/pdf",
         "text/csv",
         "text/plain",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "video/mp4",
         "video/quicktime",
@@ -85,7 +86,7 @@ const DocumentUploader: React.FC = () => {
                 document or video
               </p>
               <p className="text-xs text-gray-500">
-                Only .pdf, .csv, .txt, .docx, .mp4, .mov, .m4v accepted
+                Only .pdf, .xlsx, .csv, .txt, .docx, .mp4, .mov, .m4v accepted
               </p>
             </div>
             <input
@@ -93,7 +94,7 @@ const DocumentUploader: React.FC = () => {
               id="dropzone-file"
               type="file"
               className="hidden"
-              accept=".pdf, .csv, .txt, .docx, .mp4, .mov, .m4v"
+              accept=".pdf, .xlsx, .csv, .txt, .docx, .mp4, .mov, .m4v"
             />
           </label>
         </div>

@@ -168,6 +168,31 @@ Resources:
             Condition:
               Bool:
                 aws:SecureTransport: false
+  3Queue:
+    Type: AWS::SQS::Queue
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      VisibilityTimeout: 180
+      MessageRetentionPeriod: 3600
+ 
+  3QueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref 3Queue
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: SecureTransportPolicy2
+        Statement:
+          - Sid: AllowSecureTransportOnly
+            Effect: Deny
+            Principal: "*"
+            Action: "SQS:*"
+            Resource: "*"
+            Condition:
+              Bool:
+                aws:SecureTransport: false
  
   DocumentTable:
     Type: AWS::DynamoDB::Table
@@ -259,24 +284,24 @@ Resources:
             Path: /generate_presigned_url
             Method: GET
  
-  FullGeneratePresignedUrlFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/Full_generate_presigned_url/
-      Policies:
-        - S3CrudPolicy:
-            BucketName: !Ref DocumentBucket
-      Environment:
-        Variables:
-          BUCKET: !Ref DocumentBucket
-          REGION: !Sub ${AWS::Region}
-      Events:
-        Root:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /Full_generate_presigned_url
-            Method: GET
+  # FullGeneratePresignedUrlFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: src/Full_generate_presigned_url/
+  #     Policies:
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref DocumentBucket
+  #     Environment:
+  #       Variables:
+  #         BUCKET: !Ref DocumentBucket
+  #         REGION: !Sub ${AWS::Region}
+  #     Events:
+  #       Root:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref Api
+  #           Path: /Full_generate_presigned_url
+  #           Method: GET
  
   UploadTriggerFunction:
     Type: AWS::Serverless::Function
@@ -293,12 +318,16 @@ Resources:
             QueueName: !GetAtt EmbeddingQueue.QueueName
         - SQSSendMessagePolicy:    
             QueueName: !GetAtt 2Queue.QueueName
+        - SQSSendMessagePolicy:    
+            QueueName: !GetAtt 3Queue.QueueName
+        
       Environment:
         Variables:
           DOCUMENT_TABLE: !Ref DocumentTable
           MEMORY_TABLE: !Ref MemoryTable
           QUEUE1: !GetAtt EmbeddingQueue.QueueName
           QUEUE2: !GetAtt 2Queue.QueueName
+          QUEUE3: !GetAtt 3Queue.QueueName
           BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
       Events:
         S3Eventmp4:
@@ -366,6 +395,20 @@ Resources:
                     Value: uploads/
                   - Name: suffix
                     Value: .csv
+        S3EventXlsx:
+          Type: S3
+          Properties:
+            Bucket: !Ref DocumentBucket
+            Events:
+              - s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: uploads/
+                  - Name: suffix
+                    Value: .xlsx
+
         S3Eventtxt:
           Type: S3
           Properties:
@@ -393,59 +436,59 @@ Resources:
                   - Name: suffix
                     Value: .docx
  
-  FullUploadTriggerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/Full_upload_trigger/
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref DocumentTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref MemoryTable
-        - S3ReadPolicy:
-            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}*"
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt EmbeddingQueue.QueueName
-      Environment:
-        Variables:
-          DOCUMENT_TABLE: !Ref DocumentTable
-          MEMORY_TABLE: !Ref MemoryTable
-          QUEUE: !GetAtt EmbeddingQueue.QueueName
-          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
-      Events:
-        Root:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /Full_upload_trigger
-            Method: GET
+  # FullUploadTriggerFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: src/Full_upload_trigger/
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref DocumentTable
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref MemoryTable
+  #       - S3ReadPolicy:
+  #           BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}*"
+  #       - SQSSendMessagePolicy:
+  #           QueueName: !GetAtt EmbeddingQueue.QueueName
+  #     Environment:
+  #       Variables:
+  #         DOCUMENT_TABLE: !Ref DocumentTable
+  #         MEMORY_TABLE: !Ref MemoryTable
+  #         QUEUE: !GetAtt EmbeddingQueue.QueueName
+  #         BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
+  #     Events:
+  #       Root:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref Api
+  #           Path: /Full_upload_trigger
+  #           Method: GET
  
-  MondayUploadTriggerFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/Monday_upload_trigger/
-      Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref DocumentTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref MemoryTable
-        - S3ReadPolicy:
-            BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}*"
-        - SQSSendMessagePolicy:
-            QueueName: !GetAtt 2Queue.QueueName
-      Environment:
-        Variables:
-          DOCUMENT_TABLE: !Ref DocumentTable
-          MEMORY_TABLE: !Ref MemoryTable
-          QUEUE: !GetAtt 2Queue.QueueName
-          BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
-      Events:
-        Root:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /Monday_upload_trigger
-            Method: POST
+  # MondayUploadTriggerFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: src/Monday_upload_trigger/
+  #     Policies:
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref DocumentTable
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref MemoryTable
+  #       - S3ReadPolicy:
+  #           BucketName: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}*"
+  #       - SQSSendMessagePolicy:
+  #           QueueName: !GetAtt 2Queue.QueueName
+  #     Environment:
+  #       Variables:
+  #         DOCUMENT_TABLE: !Ref DocumentTable
+  #         MEMORY_TABLE: !Ref MemoryTable
+  #         QUEUE: !GetAtt 2Queue.QueueName
+  #         BUCKET: !Sub "${AWS::StackName}-${AWS::Region}-${AWS::AccountId}"
+  #     Events:
+  #       Root:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref Api
+  #           Path: /Monday_upload_trigger
+  #           Method: POST
  
   DeleteHistoryTriggerFunction:
     Type: AWS::Serverless::Function
@@ -553,6 +596,37 @@ Resources:
             RestApiId: !Ref Api
             Path: /doc/{documentid}
             Method: POST
+
+
+  MyRDSInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: excel-rag-db
+      AllocatedStorage: 20                # 20 GB (free tier eligible)
+      DBInstanceClass: db.t3.micro        # Free Tier instance
+      Engine: MySQL
+      EngineVersion: "8.0.42"             # pick supported version
+      MasterUsername: admin               # change as needed
+      MasterUserPassword: Parth1803 # replace with Secrets Manager ideally
+      DBName: excel_rag                 # <-- this creates the database
+      PubliclyAccessible: true
+      MultiAZ: false
+      BackupRetentionPeriod: 0
+      StorageType: gp2
+      VPCSecurityGroups:
+        - !Ref MyDBSecurityGroup
+      DeletionProtection: false
+
+  MyDBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow access to RDS
+      VpcId: vpc-0a62d4c831a06f85a # replace with your VPC ID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0 
  
   GenerateEmbeddingsFunction:
     Type: AWS::Serverless::Function
@@ -613,16 +687,15 @@ Resources:
             Queue: !GetAtt 2Queue.Arn
             BatchSize: 1
  
- 
-  FullGenerateEmbeddingsFunction:
+  GenerateExcelFileFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/Full_generate_embeddings/
+      CodeUri: src/Excel_file_upload/
       Timeout: 180
       MemorySize: 2048
       Policies:
         - SQSPollerPolicy:
-            QueueName: !GetAtt EmbeddingQueue.QueueName
+            QueueName: !GetAtt 3Queue.QueueName
         - S3CrudPolicy:
             BucketName: !Ref DocumentBucket
         - DynamoDBCrudPolicy:
@@ -636,42 +709,77 @@ Resources:
         Variables:
           DOCUMENT_TABLE: !Ref DocumentTable
           BUCKET: !Ref DocumentBucket
-      Events:
-        Root:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /Full_generate_embeddings
-            Method: GET
- 
-  MondayGenerateEmbeddingsFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: src/Monday_generate_embeddings/
-      Timeout: 180
-      MemorySize: 2048
-      Policies:
-        - SQSPollerPolicy:
-            QueueName: !GetAtt 2Queue.QueueName
-        - S3CrudPolicy:
-            BucketName: !Ref DocumentBucket
-        - DynamoDBCrudPolicy:
-            TableName: !Ref DocumentTable
-        - Statement:
-            - Sid: "BedrockScopedAccess"
-              Effect: "Allow"
-              Action: "bedrock:InvokeModel"
-              Resource: "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v1"
-      Environment:
-        Variables:
-          DOCUMENT_TABLE: !Ref DocumentTable
-          BUCKET: !Ref DocumentBucket
+          USERNAME: admin
+          PASSWORD: Parth1803
+          HOST: !GetAtt MyRDSInstance.Endpoint.Address
+          PORT: !GetAtt MyRDSInstance.Endpoint.Port
+          DATABASE: excel_rag 
+
       Events:
         EmbeddingQueueEvent:
           Type: SQS
           Properties:
-            Queue: !GetAtt 2Queue.Arn
+            Queue: !GetAtt 3Queue.Arn
             BatchSize: 1
+ 
+  # FullGenerateEmbeddingsFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: src/Full_generate_embeddings/
+  #     Timeout: 180
+  #     MemorySize: 2048
+  #     Policies:
+  #       - SQSPollerPolicy:
+  #           QueueName: !GetAtt EmbeddingQueue.QueueName
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref DocumentBucket
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref DocumentTable
+  #       - Statement:
+  #           - Sid: "BedrockScopedAccess"
+  #             Effect: "Allow"
+  #             Action: "bedrock:InvokeModel"
+  #             Resource: "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v1"
+  #     Environment:
+  #       Variables:
+  #         DOCUMENT_TABLE: !Ref DocumentTable
+  #         BUCKET: !Ref DocumentBucket
+  #     Events:
+  #       Root:
+  #         Type: Api
+  #         Properties:
+  #           RestApiId: !Ref Api
+  #           Path: /Full_generate_embeddings
+  #           Method: GET
+ 
+  # MondayGenerateEmbeddingsFunction:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     CodeUri: src/Monday_generate_embeddings/
+  #     Timeout: 180
+  #     MemorySize: 2048
+  #     Policies:
+  #       - SQSPollerPolicy:
+  #           QueueName: !GetAtt 2Queue.QueueName
+  #       - S3CrudPolicy:
+  #           BucketName: !Ref DocumentBucket
+  #       - DynamoDBCrudPolicy:
+  #           TableName: !Ref DocumentTable
+  #       - Statement:
+  #           - Sid: "BedrockScopedAccess"
+  #             Effect: "Allow"
+  #             Action: "bedrock:InvokeModel"
+  #             Resource: "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v1"
+  #     Environment:
+  #       Variables:
+  #         DOCUMENT_TABLE: !Ref DocumentTable
+  #         BUCKET: !Ref DocumentBucket
+  #     Events:
+  #       EmbeddingQueueEvent:
+  #         Type: SQS
+  #         Properties:
+  #           Queue: !GetAtt 2Queue.Arn
+  #           BatchSize: 1
  
   GenerateResponseFunction:
     Type: AWS::Serverless::Function
@@ -690,8 +798,7 @@ Resources:
               Action: "bedrock:InvokeModel"
               Resource:
                 - "arn:aws:bedrock:*::foundation-model/*"
-                - "arn:aws:bedrock:*::foundation-model/ai21.j2-mid-v1"
-                - "arn:aws:bedrock:*::foundation-model/anthropic.claude-v2"
+                - "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-haiku-20240307-v1:0"
                 - "arn:aws:bedrock:*::foundation-model/amazon.titan-embed-text-v1"
                 - "arn:aws:bedrock:*::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0"
         - Statement:

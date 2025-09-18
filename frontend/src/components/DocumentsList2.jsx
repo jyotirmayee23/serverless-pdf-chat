@@ -47,6 +47,7 @@ function DocumentsList2({
                lowerCaseName.endsWith('.docx') ||
                lowerCaseName.endsWith('.mp4') ||
                lowerCaseName.endsWith('.mov') ||
+               lowerCaseName.endsWith('.xlsx') ||
                lowerCaseName.endsWith('.m4v');
       })
       .map(file => {
@@ -143,7 +144,7 @@ function DocumentsList2({
   const getFileIcon = (filename) => {
     if (filename.endsWith('.pdf')) {
       return <FaFilePdf />;
-    } else if (filename.endsWith('.csv')) {
+    } else if (filename.endsWith('.csv') || filename.endsWith('.xlsx')) {
       return <FaFileCsv />;
     } else if (filename.endsWith('.docx')) {
       return <FaFileWord />;
@@ -264,4 +265,6 @@ function DocumentsList2({
   );
 }
  
+
 export default DocumentsList2;
+

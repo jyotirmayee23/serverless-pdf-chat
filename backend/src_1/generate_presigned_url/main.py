@@ -83,8 +83,6 @@ def lambda_handler(event, context):
         content_type = "text/plain"
     elif extension.lower() == ".docx":
         content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    elif extension.lower() == ".xlsx":
-        content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     elif extension.lower() == ".mp4":
         content_type = "video/mp4"
     elif extension.lower() == ".m4v":

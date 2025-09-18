@@ -20,7 +20,7 @@ function Layout2() {
   const [fileToView, setFileToView] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [reload, setReload] = useState(false);
-  const [model_id, setModelId] = useState("anthropic.claude-v2:1"); // Default model
+  const [model_id, setModelId] = useState("anthropic.claude-3-haiku-20240307-v1:0"); // Default model
  
  
   const handleviewFile = (public_url: string | number | boolean) => {
@@ -259,4 +259,5 @@ function Layout2() {
   );
 }
  
+
 export default Layout2;

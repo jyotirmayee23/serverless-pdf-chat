@@ -24,7 +24,7 @@ function ChatBox({
   const [filename, setFilename] = useState('');
   const [conversationId, setConversationId] = useState('');
   const [documentId, setDocumentId] = useState('');
-  const [selectedModel, setSelectedModel] = useState('anthropic.claude-v2:1');
+  const [selectedModel, setSelectedModel] = useState('anthropic.claude-3-haiku-20240307-v1:0');
  
   // const [inputValue, setInputValue] = useState("");
   // console.log("msg status", messageStatus)
@@ -127,4 +127,5 @@ function ChatBox({
   );
 }
  
+
 export default ChatBox;
