@@ -19,7 +19,7 @@ const Document: React.FC = () => {
     "idle" | "loading"
     > ("idle");
   const [prompt, setPrompt] = useState("");
-  const [model_id, setModelId] = useState("anthropic.claude-v2:1");  
+  const [model_id, setModelId] = useState("anthropic.claude-3-haiku-20240307-v1:0");  
  
   const fetchData = async (conversationid = params.conversationid) => {
     setLoading("loading");
